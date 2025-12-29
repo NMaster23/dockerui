@@ -27,7 +27,7 @@ fn dockercreds(username_input: String, password_input: String, ip_addr_input: St
     authentication.write_all(auth.as_bytes()).unwrap();
 }
 
-fn docker_commands(ip_addr_input: String, command: String, ui: &AppWindow) {
+fn docker_commands(ip_addr_input: String, command: String, count: i32, ui: &AppWindow) {
     let connectionaddress = format!("{}:22", ip_addr_input);
     let tcp = TcpStream::connect(connectionaddress).unwrap();
     let mut sess = Session::new().unwrap();
@@ -48,7 +48,16 @@ fn docker_commands(ip_addr_input: String, command: String, ui: &AppWindow) {
     }
     let _ = channel.close();
     println!("Intended Disconnection Suceeded");
-    ui.set_commandoutput(output.into());
+    if count == 1 {
+        ui.set_dockeroutput1(output.into());
+    } else if count == 2 {
+        ui.set_dockeroutput2(output.into());
+    }
+}
+
+fn refresh(dockerip: String, ui: &AppWindow) {
+    docker_commands(dockerip.clone(), r"docker container list --format 'table {{.ID}}'".to_string(), 1,ui);
+    docker_commands(dockerip.clone(), r"docker container list --format 'table {{.Size}}'".to_string(), 2,ui);
 }
 
 fn main() {
@@ -63,7 +72,7 @@ fn main() {
         ui.set_credentialcreation(false);
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
-        docker_commands(dockerip, r"docker image list --format 'table {{.ID}}\t{{.Repository}}\t{{.Tag}}\t{{.Size}}'".to_string(), &ui);
+        refresh(dockerip, &ui);
     }
     ui.run().unwrap();
 }

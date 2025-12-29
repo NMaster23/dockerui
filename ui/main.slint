@@ -5,8 +5,9 @@ export component AppWindow inherits Window {
     property <bool> credentialsfilled: false;
     property <bool> showcompletedload: false;
     property <int> loadingbarcompletion: 0;
-    in-out property <string> commandoutput;
     in property <int> tabnumber;
+    in-out property <string> dockeroutput1;
+    in-out property <string> dockeroutput2;
     preferred-width: 800px;
     preferred-height: 600px;
     min-width: 600px;
@@ -56,10 +57,15 @@ export component AppWindow inherits Window {
             preferred-height: 200px;
             Tab {
                 title: "Containers";
-                Text {
-                    text: commandoutput;
-                    horizontal-alignment: center;
-                    vertical-alignment: center;
+                Rectangle {
+                    border-color: aquamarine;
+                    border-width: 1px;
+                    border-radius: 10px;
+                    Text {
+                        text: dockeroutput1;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
                 }
             }
             Tab {
