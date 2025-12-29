@@ -1,0 +1,73 @@
+import { LineEdit, VerticalBox, Button, ProgressIndicator, TabWidget } from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    in-out property <bool> credentialcreation: true;
+    property <bool> credentialsfilled: false;
+    property <bool> showcompletedload: false;
+    property <int> loadingbarcompletion: 0;
+    in-out property <string> commandoutput;
+    in property <int> tabnumber;
+    preferred-width: 800px;
+    preferred-height: 600px;
+    min-width: 600px;
+    min-height: 600px;
+
+    callback send_credentials(string, string, string);
+
+    title: "Docker UI";
+    default-font-family: "JetBrains Mono";
+    resize-border-width: 0px;
+
+    VerticalBox {
+        uiusername:= LineEdit {
+            visible: root.credentialcreation;
+            max-height: 40px;
+            placeholder-text: "Username";
+            horizontal-alignment: center;
+        }
+        uipassword:= LineEdit {
+            visible: root.credentialcreation;
+            max-height: 40px;
+            placeholder-text: "Password";
+            input-type: password;
+            horizontal-alignment: center;
+            text: "";
+        }
+        uiipaddress:= LineEdit {
+            visible: root.credentialcreation;
+            max-height: 40px;
+            placeholder-text: "IP Address";
+            horizontal-alignment: center;
+            accepted(text) => {
+                root.credentialsfilled = true;
+            }
+        }
+        if root.credentialcreation && root.credentialsfilled: Button {
+            text: "Submit";
+            preferred-height: 40px;
+            preferred-width: 100px;
+            
+            clicked => {
+                root.credentialcreation = false;
+                send_credentials(uiusername.text, uipassword.text, uiipaddress.text);
+            }
+        }
+        TabWidget {
+            preferred-height: 200px;
+            Tab {
+                title: "Containers";
+                Text {
+                    text: commandoutput;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+            Tab {
+                title: "Second";
+                Rectangle {
+                    background: blue;
+                }
+            }
+        }
+    }
+}
