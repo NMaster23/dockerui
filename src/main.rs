@@ -52,12 +52,27 @@ fn docker_commands(ip_addr_input: String, command: String, count: i32, ui: &AppW
         ui.set_dockeroutput1(output.into());
     } else if count == 2 {
         ui.set_dockeroutput2(output.into());
+    } else if count == 3 {
+        ui.set_dockeroutput3(output.into());
+    } else if count == 4 {
+        ui.set_dockeroutput4(output.into());
+    } else if count == 5 {
+        ui.set_dockeroutput5(output.into());
+    } else if count == 6 {
+        ui.set_dockeroutput6(output.into());
+    } else if count == 7 {
+        ui.set_dockeroutput7(output.into());
     }
 }
 
 fn refresh(dockerip: String, ui: &AppWindow) {
     docker_commands(dockerip.clone(), r"docker container list --format 'table {{.ID}}'".to_string(), 1,ui);
     docker_commands(dockerip.clone(), r"docker container list --format 'table {{.Size}}'".to_string(), 2,ui);
+    docker_commands(dockerip.clone(), r"docker ps --format 'table {{.Names}}'".to_string(), 3, ui);
+    docker_commands(dockerip.clone(), r"docker image list --format 'table {{.ID}}'".to_string(), 4, ui);
+    docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Repository}}'".to_string(), 5, ui);
+    docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Tag}}'".to_string(), 6, ui);
+    docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Size}}'".to_string(), 7, ui);
 }
 
 fn main() {
@@ -72,7 +87,6 @@ fn main() {
         ui.set_credentialcreation(false);
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
-        refresh(dockerip, &ui);
     }
     ui.run().unwrap();
 }

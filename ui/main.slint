@@ -1,4 +1,4 @@
-import { LineEdit, VerticalBox, Button, ProgressIndicator, TabWidget } from "std-widgets.slint";
+import { LineEdit, VerticalBox, Button, ProgressIndicator, TabWidget, HorizontalBox } from "std-widgets.slint";
 
 export component AppWindow inherits Window {
     in-out property <bool> credentialcreation: true;
@@ -6,14 +6,21 @@ export component AppWindow inherits Window {
     property <bool> showcompletedload: false;
     property <int> loadingbarcompletion: 0;
     in property <int> tabnumber;
+    in-out property <bool> refreshbutton: false;
     in-out property <string> dockeroutput1;
     in-out property <string> dockeroutput2;
+    in-out property <string> dockeroutput3;
+    in-out property <string> dockeroutput4;
+    in-out property <string> dockeroutput5;
+    in-out property <string> dockeroutput6;
+    in-out property <string> dockeroutput7;
     preferred-width: 800px;
     preferred-height: 600px;
     min-width: 600px;
     min-height: 600px;
 
     callback send_credentials(string, string, string);
+    callback send_refresh_state(bool);
 
     title: "Docker UI";
     default-font-family: "JetBrains Mono";
@@ -53,25 +60,45 @@ export component AppWindow inherits Window {
                 send_credentials(uiusername.text, uipassword.text, uiipaddress.text);
             }
         }
+        Button {
+            text: "Refresh";
+            clicked => {
+                root.refreshbutton = true;
+                send_refresh_state(true)
+            }
+        }
         TabWidget {
             preferred-height: 200px;
             Tab {
+                
                 title: "Containers";
-                Rectangle {
-                    border-color: aquamarine;
-                    border-width: 1px;
-                    border-radius: 10px;
+                HorizontalBox {
                     Text {
                         text: dockeroutput1;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
+                    }
+                    Text {
+                        text: dockeroutput3;
+                    }
+                    Text {
+                        text: dockeroutput2;
                     }
                 }
             }
             Tab {
-                title: "Second";
-                Rectangle {
-                    background: blue;
+                title: "Images";
+                HorizontalBox {
+                    Text {
+                        text: dockeroutput4;
+                    }
+                    Text {
+                        text: dockeroutput5;
+                    }
+                    Text {
+                        text: dockeroutput6;
+                    }
+                    Text {
+                        text: dockeroutput7;
+                    }
                 }
             }
         }
