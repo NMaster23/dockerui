@@ -87,6 +87,7 @@ fn main() {
         ui.set_credentialcreation(false);
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
+        refresh(dockerip, &ui);
     }
     ui.run().unwrap();
 }
