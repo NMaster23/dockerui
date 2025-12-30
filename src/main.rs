@@ -3,7 +3,6 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::path::Path;
 use std::io::Write;
-use serde_json::Value;
 use serde::{Serialize, Deserialize};
 use std::net::TcpStream;
 use ssh2::Session;
@@ -19,40 +18,55 @@ struct DockerCred {
 
 #[derive(Serialize, Deserialize)]
 struct DockerInfo {
+    #[serde(rename = "Command")]
     command: String,
+    #[serde(rename = "CreatedAt")]
     createdat: String,
+    #[serde(rename = "ID")]
     dockerid: String,
+    #[serde(rename = "Image")]
     image: String,
+    #[serde(rename = "Labels")]
     labels: String,
+    #[serde(rename = "LocalVolumes")]
     localvolumes: String,
+    #[serde(rename = "Mounts")]
     mounts: String,
+    #[serde(rename = "Names")]
     names: String,
+    #[serde(rename = "Networks")]
     networks: String,
-    platform: String,
+    #[serde(rename = "Platform")]
+    platform: Option<String>,
+    #[serde(rename = "Ports")]
     ports: String,
+    #[serde(rename = "RunningFor")]
     runningfor: String,
+    #[serde(rename = "Size")]
     size: String,
+    #[serde(rename = "State")]
     state: String,
+    #[serde(rename = "Status")]
     status: String,
 }
-
+/*
 enum DockerInfo {
-    command: String,
-    createdat: String,
-    dockerid: String,
-    image: String,
-    labels: String,
-    localvolumes: String,
-    mounts: String,
-    names: String,
-    networks: String,
-    platform: String,
-    ports: String,
-    String,
-    String,
-    String,
-    String,
-}
+    command(String),
+    createdat(String),
+    dockerid(String),
+    image(String),
+    labels(String),
+    localvolumes(String),
+    mounts(String),
+    names(String),
+    networks(String),
+    platform(String),
+    ports(String),
+    runningfor(String),
+    size(String),
+    state(String),
+    status(String),
+}*/
 
 fn dockercreds(username_input: String, password_input: String, ip_addr_input: String) {
     let dockercred = DockerCred {
@@ -94,7 +108,8 @@ fn docker_info() {
     let mut dockerinfo_reader = BufReader::new(dockerinfo_file);
     let mut dockerinfo_outputline = String::new();
     let dockerinfo_read = dockerinfo_reader.read_line(&mut dockerinfo_outputline);
-    let dockerinfo_output: DockerInfo = serde_json::from_str(dockerinfo_outputline);
+    let dockerinfo_output: DockerInfo = serde_json::from_str(&dockerinfo_outputline).unwrap();
+    println!("{}", &dockerinfo_output.command)
 }
 
 
