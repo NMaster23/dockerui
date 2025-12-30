@@ -1,8 +1,9 @@
-use std::fs;
+use std::{fs, io::BufReader};
 use std::io::prelude::*;
 use std::fs::File;
 use std::path::Path;
 use std::io::Write;
+use serde_json::Value;
 use serde::{Serialize, Deserialize};
 use std::net::TcpStream;
 use ssh2::Session;
@@ -33,6 +34,24 @@ struct DockerInfo {
     size: String,
     state: String,
     status: String,
+}
+
+enum DockerInfo {
+    command: String,
+    createdat: String,
+    dockerid: String,
+    image: String,
+    labels: String,
+    localvolumes: String,
+    mounts: String,
+    names: String,
+    networks: String,
+    platform: String,
+    ports: String,
+    String,
+    String,
+    String,
+    String,
 }
 
 fn dockercreds(username_input: String, password_input: String, ip_addr_input: String) {
@@ -70,6 +89,15 @@ fn docker_command(ip_addr_input: String, command: String) {
 
 }
 
+fn docker_info() {
+    let mut dockerinfo_file = File::open("dockerinfo.inf").unwrap();
+    let mut dockerinfo_reader = BufReader::new(dockerinfo_file);
+    let mut dockerinfo_outputline = String::new();
+    let dockerinfo_read = dockerinfo_reader.read_line(&mut dockerinfo_outputline);
+    let dockerinfo_output: DockerInfo = serde_json::from_str(dockerinfo_outputline);
+}
+
+
 fn main() {
     let ui = AppWindow::new().unwrap();
     ui.on_send_credentials(|username_input: slint::SharedString, password_input: slint::SharedString, ip_addr_input: slint::SharedString| {
@@ -78,11 +106,13 @@ fn main() {
         let uiipaddress = ip_addr_input.to_string();
         dockercreds(uiusername, uipassword, uiipaddress);
     });
-    if Path::new("D:\\VSCode\\hackclub\\dockerui\\dockercred.crd").exists() == true {
+    if Path::new("dockercred.crd").exists() == true {
         ui.set_credentialcreation(false);
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
         docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string());
+        println!("Executed");
+        docker_info();
     }
     ui.run().unwrap();
 }
