@@ -27,7 +27,7 @@ fn dockercreds(username_input: String, password_input: String, ip_addr_input: St
     authentication.write_all(auth.as_bytes()).unwrap();
 }
 
-fn docker_commands(ip_addr_input: String, command: String, count: i32, ui: &AppWindow) {
+fn docker_command(ip_addr_input: String, command: String) {
     let connectionaddress = format!("{}:22", ip_addr_input);
     let tcp = TcpStream::connect(connectionaddress).unwrap();
     let mut sess = Session::new().unwrap();
@@ -38,16 +38,20 @@ fn docker_commands(ip_addr_input: String, command: String, count: i32, ui: &AppW
     assert!(sess.authenticated());
     let mut channel = sess.channel_session().unwrap();
     channel.exec(&command).unwrap();
-    let mut s = String::new();
-    channel.read_to_string(&mut s).unwrap();
+    let mut output = String::new();
+    channel.read_to_string(&mut output).unwrap();
     println!("{}", channel.exit_status().unwrap());
     let condition = channel.exit_status().unwrap();
-    let output = s;
     if condition != 0 {
         println!("Error 0. Unknown Error occurred.");
     }
     let _ = channel.close();
-    if count == 1 {
+    let dockercontainerinfo = serde_json::to_string(&output).unwrap();
+    let mut dockerinfo = File::create("dockerinfo.info").unwrap();
+    dockerinfo.write_all(dockercontainerinfo.as_bytes()).unwrap();    
+
+}
+/*    if count == 1 {
         ui.set_dockeroutput1(output.into());
     } else if count == 2 {
         ui.set_dockeroutput2(output.into());
@@ -80,7 +84,7 @@ fn refresh(dockerip: String, ui: &AppWindow) {
     docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Size}}'".to_string(), 7, ui);
     docker_commands(dockerip.clone(), r"hostnamectl".to_string(), 8, ui);
 }
-
+*/
 fn main() {
     let ui = AppWindow::new().unwrap();
     ui.on_send_credentials(|username_input: slint::SharedString, password_input: slint::SharedString, ip_addr_input: slint::SharedString| {
@@ -94,7 +98,9 @@ fn main() {
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
     //    refresh(dockerip, &ui);
-        docker_commands(dockerip.clone(), r"docker ps -a --fromat '{{json .}}'".to_string(), 0, &ui);
+        docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string());
+        let docker: Docker = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
+
     }
     ui.run().unwrap();
 }
