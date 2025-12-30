@@ -16,6 +16,25 @@ struct DockerCred {
     ip_addr: String,
 }
 
+#[derive(Serialize, Deserialize)]
+struct DockerInfo {
+    command: String,
+    createdat: String,
+    dockerid: String,
+    image: String,
+    labels: String,
+    localvolumes: String,
+    mounts: String,
+    names: String,
+    networks: String,
+    platform: String,
+    ports: String,
+    runningfor: String,
+    size: String,
+    state: String,
+    status: String,
+}
+
 fn dockercreds(username_input: String, password_input: String, ip_addr_input: String) {
     let dockercred = DockerCred {
         username: username_input,
@@ -46,45 +65,11 @@ fn docker_command(ip_addr_input: String, command: String) {
         println!("Error 0. Unknown Error occurred.");
     }
     let _ = channel.close();
-    let dockercontainerinfo = serde_json::to_string(&output).unwrap();
-    let mut dockerinfo = File::create("dockerinfo.info").unwrap();
-    dockerinfo.write_all(dockercontainerinfo.as_bytes()).unwrap();    
+    let mut dockerinfo = File::create("dockerinfo.inf").unwrap();
+    dockerinfo.write_all(output.as_bytes()).unwrap();    
 
 }
-/*    if count == 1 {
-        ui.set_dockeroutput1(output.into());
-    } else if count == 2 {
-        ui.set_dockeroutput2(output.into());
-    } else if count == 3 {
-        ui.set_dockeroutput3(output.into());
-    } else if count == 4 {
-        ui.set_dockeroutput4(output.into());
-    } else if count == 5 {
-        ui.set_dockeroutput5(output.into());
-    } else if count == 6 {
-        ui.set_dockeroutput6(output.into());
-    } else if count == 7 {
-        ui.set_dockeroutput7(output.into());
-    } else if count == 8 {
-        ui.set_dockeroutput8(output.into())
-    } else if count == 0 {
-        let test = serde_json::to_string(&output).unwrap();
-        let mut authentication = File::create("test.crd").unwrap();
-        authentication.write_all(test.as_bytes()).unwrap();
-    }
-}
 
-fn refresh(dockerip: String, ui: &AppWindow) {
-    docker_commands(dockerip.clone(), r"docker container list --format 'table {{.ID}}'".to_string(), 1,ui);
-    docker_commands(dockerip.clone(), r"docker ps --format 'table {{.Names}}'".to_string(), 2,ui);
-    docker_commands(dockerip.clone(), r"docker container list --format 'table {{.Size}}'".to_string(), 3, ui);
-    docker_commands(dockerip.clone(), r"docker image list --format 'table {{.ID}}'".to_string(), 4, ui);
-    docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Repository}}'".to_string(), 5, ui);
-    docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Tag}}'".to_string(), 6, ui);
-    docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Size}}'".to_string(), 7, ui);
-    docker_commands(dockerip.clone(), r"hostnamectl".to_string(), 8, ui);
-}
-*/
 fn main() {
     let ui = AppWindow::new().unwrap();
     ui.on_send_credentials(|username_input: slint::SharedString, password_input: slint::SharedString, ip_addr_input: slint::SharedString| {
@@ -97,10 +82,7 @@ fn main() {
         ui.set_credentialcreation(false);
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
-    //    refresh(dockerip, &ui);
         docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string());
-        let docker: Docker = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
-
     }
     ui.run().unwrap();
 }
