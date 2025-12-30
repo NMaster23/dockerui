@@ -76,14 +76,29 @@ export component AppWindow inherits Window {
                 
                 title: "Containers";
                 HorizontalBox {
-                    Text {
-                        text: dockeroutput1;
+                    Rectangle {
+                        border-radius: 10px;
+                        border-color: red;
+                        border-width: 3px;
+                        Text {
+                            text: dockeroutput1;
+                        }
                     }
-                    Text {
-                        text: dockeroutput3;
+                    Rectangle {
+                        border-radius: 10px;
+                        border-color: aquamarine;
+                        border-width: 3px;
+                        Text {
+                            text: dockeroutput3;
+                        }
                     }
-                    Text {
-                        text: dockeroutput2;
+                    Rectangle {
+                        border-radius: 10px;
+                        border-color: cyan;
+                        border-width: 3px;
+                        Text {
+                            text: dockeroutput2;
+                        }
                     }
                 }
             }
