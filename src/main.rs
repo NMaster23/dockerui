@@ -62,6 +62,8 @@ fn docker_commands(ip_addr_input: String, command: String, count: i32, ui: &AppW
         ui.set_dockeroutput6(output.into());
     } else if count == 7 {
         ui.set_dockeroutput7(output.into());
+    } else if count == 8 {
+        ui.set_dockeroutput8(output.into())
     }
 }
 
@@ -73,6 +75,7 @@ fn refresh(dockerip: String, ui: &AppWindow) {
     docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Repository}}'".to_string(), 5, ui);
     docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Tag}}'".to_string(), 6, ui);
     docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Size}}'".to_string(), 7, ui);
+    docker_commands(dockerip.clone(), r"hostnamectl".to_string(), 8, ui);
 }
 
 fn main() {

@@ -14,6 +14,9 @@ export component AppWindow inherits Window {
     in-out property <string> dockeroutput5;
     in-out property <string> dockeroutput6;
     in-out property <string> dockeroutput7;
+    in-out property <string> dockeroutput8;
+    in-out property <string> dockeroutput9;
+    in-out property <string> dockeroutput10;
     preferred-width: 800px;
     preferred-height: 600px;
     min-width: 600px;
@@ -99,6 +102,12 @@ export component AppWindow inherits Window {
                     Text {
                         text: dockeroutput7;
                     }
+                }
+            }
+            Tab {
+                title: "System";
+                Text {
+                    text: dockeroutput8;
                 }
             }
         }
