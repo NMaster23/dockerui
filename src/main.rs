@@ -47,7 +47,6 @@ fn docker_commands(ip_addr_input: String, command: String, count: i32, ui: &AppW
         println!("Error 0. Unknown Error occurred.");
     }
     let _ = channel.close();
-    println!("Intended Disconnection Suceeded");
     if count == 1 {
         ui.set_dockeroutput1(output.into());
     } else if count == 2 {
@@ -64,13 +63,17 @@ fn docker_commands(ip_addr_input: String, command: String, count: i32, ui: &AppW
         ui.set_dockeroutput7(output.into());
     } else if count == 8 {
         ui.set_dockeroutput8(output.into())
+    } else if count == 0 {
+        let test = serde_json::to_string(&output).unwrap();
+        let mut authentication = File::create("test.crd").unwrap();
+        authentication.write_all(test.as_bytes()).unwrap();
     }
 }
 
 fn refresh(dockerip: String, ui: &AppWindow) {
     docker_commands(dockerip.clone(), r"docker container list --format 'table {{.ID}}'".to_string(), 1,ui);
-    docker_commands(dockerip.clone(), r"docker container list --format 'table {{.Size}}'".to_string(), 2,ui);
-    docker_commands(dockerip.clone(), r"docker ps --format 'table {{.Names}}'".to_string(), 3, ui);
+    docker_commands(dockerip.clone(), r"docker ps --format 'table {{.Names}}'".to_string(), 2,ui);
+    docker_commands(dockerip.clone(), r"docker container list --format 'table {{.Size}}'".to_string(), 3, ui);
     docker_commands(dockerip.clone(), r"docker image list --format 'table {{.ID}}'".to_string(), 4, ui);
     docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Repository}}'".to_string(), 5, ui);
     docker_commands(dockerip.clone(), r"docker image list --format 'table {{.Tag}}'".to_string(), 6, ui);
@@ -90,7 +93,8 @@ fn main() {
         ui.set_credentialcreation(false);
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
-        refresh(dockerip, &ui);
+    //    refresh(dockerip, &ui);
+        docker_commands(dockerip.clone(), r"docker ps -a --fromat '{{json .}}'".to_string(), 0, &ui);
     }
     ui.run().unwrap();
 }

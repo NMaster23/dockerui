@@ -7,6 +7,7 @@ export component AppWindow inherits Window {
     property <int> loadingbarcompletion: 0;
     in property <int> tabnumber;
     in-out property <bool> refreshbutton: false;
+    property <length> infofontsize: root.height * 0.035;
     in-out property <string> dockeroutput1;
     in-out property <string> dockeroutput2;
     in-out property <string> dockeroutput3;
@@ -42,7 +43,6 @@ export component AppWindow inherits Window {
             placeholder-text: "Password";
             input-type: password;
             horizontal-alignment: center;
-            text: "";
         }
         uiipaddress:= LineEdit {
             visible: root.credentialcreation;
@@ -73,31 +73,38 @@ export component AppWindow inherits Window {
         TabWidget {
             preferred-height: 200px;
             Tab {
-                
                 title: "Containers";
                 HorizontalBox {
-                    Rectangle {
+                    rect1:= Rectangle {
                         border-radius: 10px;
-                        border-color: red;
-                        border-width: 3px;
-                        Text {
+                        border-color: #0400ff;
+                        border-width: 1px;
+                        height: text1.height + 30px;
+                        width: text1.width + 30px;
+                        text1:= Text {
                             text: dockeroutput1;
+                            font-size: 25pt;
+                            letter-spacing: 4px;
                         }
                     }
                     Rectangle {
                         border-radius: 10px;
-                        border-color: aquamarine;
-                        border-width: 3px;
-                        Text {
-                            text: dockeroutput3;
-                        }
-                    }
-                    Rectangle {
-                        border-radius: 10px;
-                        border-color: cyan;
-                        border-width: 3px;
-                        Text {
+                        border-color: #0400ff;
+                        border-width: 1px;
+                        height: text2.height + 30px;
+                        width: text2.width + 30px;
+                        text2:= Text {
                             text: dockeroutput2;
+                        }
+                    }
+                    Rectangle {
+                        border-radius: 10px;
+                        border-color: #0400ff;
+                        border-width: 1px;
+                        height: text3.height + 30px;
+                        width: text3.width + 30px;
+                        text3:= Text {
+                            text: dockeroutput3;
                         }
                     }
                 }
@@ -105,24 +112,59 @@ export component AppWindow inherits Window {
             Tab {
                 title: "Images";
                 HorizontalBox {
-                    Text {
-                        text: dockeroutput4;
+                    Rectangle {
+                        border-radius: 10px;
+                        border-color: #0400ff;
+                        border-width: 1px;
+                        height: text4.height + 30px;
+                        width: text4.width + 30px;
+                        text4:= Text {
+                            text: dockeroutput4;
+                        }
                     }
-                    Text {
-                        text: dockeroutput5;
+                    Rectangle {
+                        border-radius: 10px;
+                        border-color: #0400ff;
+                        border-width: 1px;
+                        height: text5.height + 30px;
+                        width: text5.width + 30px;
+                        text5:= Text {
+                            text: dockeroutput5;
+                        }
                     }
-                    Text {
-                        text: dockeroutput6;
+                    Rectangle {
+                        border-radius: 10px;
+                        border-color: #0400ff;
+                        border-width: 1px;
+                        height: text6.height + 30px;
+                        width: text6.width + 30px;
+                        text6:= Text {
+                            text: dockeroutput6;
+                        }
                     }
-                    Text {
-                        text: dockeroutput7;
+                    Rectangle {
+                        border-radius: 10px;
+                        border-color: #0400ff;
+                        border-width: 1px;
+                        height: text7.height + 30px;
+                        width: text7.width + 30px;
+                        text7:= Text {
+                            text: dockeroutput7;
+                        }
                     }
                 }
             }
             Tab {
                 title: "System";
-                Text {
-                    text: dockeroutput8;
+                Rectangle {
+                    border-radius: 10px;
+                    border-color: #0400ff;
+                    border-width: 1px;
+                    height: text8.height + 30px;
+                    width: text8.width + 30px;
+                    text8:= Text {
+                        text: dockeroutput8;
+                    }
                 }
             }
         }
