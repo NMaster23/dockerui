@@ -49,24 +49,6 @@ struct DockerInfo {
     #[serde(rename = "Status")]
     status: String,
 }
-/*
-enum DockerInfo {
-    command(String),
-    createdat(String),
-    dockerid(String),
-    image(String),
-    labels(String),
-    localvolumes(String),
-    mounts(String),
-    names(String),
-    networks(String),
-    platform(String),
-    ports(String),
-    runningfor(String),
-    size(String),
-    state(String),
-    status(String),
-}*/
 
 fn dockercreds(username_input: String, password_input: String, ip_addr_input: String) {
     let dockercred = DockerCred {
@@ -111,7 +93,7 @@ fn docker_info() -> Vec<DockerInfo> {
     let mut dockerinfo_item: Vec<DockerInfo> = Vec::new();
     let dockerinfo_file = File::open("dockerinfo.inf").unwrap();
     let mut dockerinfo_reader = BufReader::new(dockerinfo_file);
-    for line in 0..newlines {
+    for _line in 0..newlines {
         let mut dockerinfo_outputline = String::new();
         let _dockerinfo_read = dockerinfo_reader.read_line(&mut dockerinfo_outputline);
         let dockerinfo_output: DockerInfo = serde_json::from_str(&dockerinfo_outputline).unwrap();
@@ -136,8 +118,6 @@ fn main() {
         docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string());
         println!("Executed");
         let dockerinfo = docker_info();
-        
-        
     }
     ui.run().unwrap();
 }
