@@ -103,24 +103,21 @@ fn docker_command(ip_addr_input: String, command: String) {
 
 }
 
-fn docker_info() {
+fn docker_info() -> Vec<DockerInfo> {
+    let getnewlines_file = fs::read("dockerinfo.inf").unwrap();
+    let newlines_amount = getnewlines_file.lines().count();
+    let newlines: i32 = newlines_amount as i32;
+    println!("{}", newlines_amount);
+    let mut dockerinfo_item: Vec<DockerInfo> = Vec::new();
     let dockerinfo_file = File::open("dockerinfo.inf").unwrap();
     let mut dockerinfo_reader = BufReader::new(dockerinfo_file);
-    let mut dockerinfo_outputline = String::new();
-    let _dockerinfo_read = dockerinfo_reader.read_line(&mut dockerinfo_outputline);
-    let dockerinfo_output: DockerInfo = serde_json::from_str(&dockerinfo_outputline).unwrap();
-    println!("{}", &dockerinfo_output.command)
-}
-
-fn dockerinfo_newlines(path: String) {
-    let getnewlines_file = fs::read(path).unwrap();
-    let newlines_amount = getnewlines_file.lines().count();
-    println!("{}", newlines_amount);
-    let mut dockerinfo_count = newlines_amount;
-    while dockerinfo_count > 0 {
-        docker_info();
-        dockerinfo_count -= 1;
+    for line in 0..newlines {
+        let mut dockerinfo_outputline = String::new();
+        let _dockerinfo_read = dockerinfo_reader.read_line(&mut dockerinfo_outputline);
+        let dockerinfo_output: DockerInfo = serde_json::from_str(&dockerinfo_outputline).unwrap();
+        dockerinfo_item.push(dockerinfo_output);
     }
+    return dockerinfo_item;
 }
 
 
@@ -138,7 +135,9 @@ fn main() {
         let dockerip = dockercred.ip_addr.to_string();
         docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string());
         println!("Executed");
-        dockerinfo_newlines("dockerinfo.inf".to_string());
+        let dockerinfo = docker_info();
+        
+        
     }
     ui.run().unwrap();
 }

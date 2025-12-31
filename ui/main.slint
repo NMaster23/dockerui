@@ -8,16 +8,21 @@ export component AppWindow inherits Window {
     in property <int> tabnumber;
     in-out property <bool> refreshbutton: false;
     property <length> infofontsize: root.height * 0.035;
-    in-out property <string> dockeroutput1;
-    in-out property <string> dockeroutput2;
-    in-out property <string> dockeroutput3;
-    in-out property <string> dockeroutput4;
-    in-out property <string> dockeroutput5;
-    in-out property <string> dockeroutput6;
-    in-out property <string> dockeroutput7;
-    in-out property <string> dockeroutput8;
-    in-out property <string> dockeroutput9;
-    in-out property <string> dockeroutput10;
+    in-out property <string> command;
+    in-out property <string> createdat;
+    in-out property <string> dockerid;
+    in-out property <string> image;
+    in-out property <string> labels;
+    in-out property <string> localvolumes;
+    in-out property <string> mounts;
+    in-out property <string> names;
+    in-out property <string> networks;
+    in-out property <string> platform;
+    in-out property <string> ports;
+    in-out property <string> runningfor;
+    in-out property <string> size;
+    in-out property <string> state;
+    in-out property <string> status;
     preferred-width: 800px;
     preferred-height: 600px;
     min-width: 600px;
@@ -70,103 +75,8 @@ export component AppWindow inherits Window {
                 send_refresh_state(true)
             }
         }
-        TabWidget {
-            preferred-height: 200px;
-            Tab {
-                title: "Containers";
-                HorizontalBox {
-                    rect1:= Rectangle {
-                        border-radius: 10px;
-                        border-color: #0400ff;
-                        border-width: 1px;
-                        height: text1.height + 30px;
-                        width: text1.width + 30px;
-                        text1:= Text {
-                            text: dockeroutput1;
-                            font-size: 25pt;
-                            letter-spacing: 4px;
-                        }
-                    }
-                    Rectangle {
-                        border-radius: 10px;
-                        border-color: #0400ff;
-                        border-width: 1px;
-                        height: text2.height + 30px;
-                        width: text2.width + 30px;
-                        text2:= Text {
-                            text: dockeroutput2;
-                        }
-                    }
-                    Rectangle {
-                        border-radius: 10px;
-                        border-color: #0400ff;
-                        border-width: 1px;
-                        height: text3.height + 30px;
-                        width: text3.width + 30px;
-                        text3:= Text {
-                            text: dockeroutput3;
-                        }
-                    }
-                }
-            }
-            Tab {
-                title: "Images";
-                HorizontalBox {
-                    Rectangle {
-                        border-radius: 10px;
-                        border-color: #0400ff;
-                        border-width: 1px;
-                        height: text4.height + 30px;
-                        width: text4.width + 30px;
-                        text4:= Text {
-                            text: dockeroutput4;
-                        }
-                    }
-                    Rectangle {
-                        border-radius: 10px;
-                        border-color: #0400ff;
-                        border-width: 1px;
-                        height: text5.height + 30px;
-                        width: text5.width + 30px;
-                        text5:= Text {
-                            text: dockeroutput5;
-                        }
-                    }
-                    Rectangle {
-                        border-radius: 10px;
-                        border-color: #0400ff;
-                        border-width: 1px;
-                        height: text6.height + 30px;
-                        width: text6.width + 30px;
-                        text6:= Text {
-                            text: dockeroutput6;
-                        }
-                    }
-                    Rectangle {
-                        border-radius: 10px;
-                        border-color: #0400ff;
-                        border-width: 1px;
-                        height: text7.height + 30px;
-                        width: text7.width + 30px;
-                        text7:= Text {
-                            text: dockeroutput7;
-                        }
-                    }
-                }
-            }
-            Tab {
-                title: "System";
-                Rectangle {
-                    border-radius: 10px;
-                    border-color: #0400ff;
-                    border-width: 1px;
-                    height: text8.height + 30px;
-                    width: text8.width + 30px;
-                    text8:= Text {
-                        text: dockeroutput8;
-                    }
-                }
-            }
+        Text {
+
         }
     }
 }
