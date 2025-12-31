@@ -1,4 +1,4 @@
-import { LineEdit, VerticalBox, Button, ProgressIndicator, TabWidget, HorizontalBox } from "std-widgets.slint";
+import { LineEdit, VerticalBox, Button, ProgressIndicator, TabWidget, HorizontalBox, TextEdit } from "std-widgets.slint";
 
 export component AppWindow inherits Window {
     in-out property <bool> credentialcreation: true;
@@ -8,6 +8,7 @@ export component AppWindow inherits Window {
     in property <int> tabnumber;
     in-out property <bool> refreshbutton: false;
     property <length> infofontsize: root.height * 0.035;
+    in-out property <string> terminaltext;
     in-out property <string> command;
     in-out property <string> createdat;
     in-out property <string> dockerid;
@@ -30,6 +31,7 @@ export component AppWindow inherits Window {
 
     callback send_credentials(string, string, string);
     callback send_refresh_state(bool);
+    callback terminal_input(string);
 
     title: "Docker UI";
     default-font-family: "JetBrains Mono";
@@ -75,8 +77,25 @@ export component AppWindow inherits Window {
                 send_refresh_state(true)
             }
         }
-        Text {
-
+        TabWidget {
+            Tab {
+                title: "Docker Info";
+            }
+            Tab {
+                title: "System";
+                LineEdit {
+                    horizontal-alignment: center;
+                    placeholder-text: "Terminal";
+                    accepted(text) => {
+                        terminal_input(text)
+                    }
+                }
+                TextEdit {
+                    horizontal-alignment: center;
+                    text: terminaltext;
+                    enabled: false;
+                }
+            }
         }
     }
 }

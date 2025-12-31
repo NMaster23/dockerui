@@ -61,7 +61,7 @@ fn dockercreds(username_input: String, password_input: String, ip_addr_input: St
     authentication.write_all(auth.as_bytes()).unwrap();
 }
 
-fn docker_command(ip_addr_input: String, command: String) {
+fn docker_command(ip_addr_input: String, command: String, case: i32) {
     let connectionaddress = format!("{}:22", ip_addr_input);
     let tcp = TcpStream::connect(connectionaddress).unwrap();
     let mut sess = Session::new().unwrap();
@@ -80,8 +80,12 @@ fn docker_command(ip_addr_input: String, command: String) {
         println!("Error 0. Unknown Error occurred.");
     }
     let _ = channel.close();
-    let mut dockerinfo = File::create("dockerinfo.inf").unwrap();
-    dockerinfo.write_all(output.as_bytes()).unwrap();    
+    if case == 0 {
+        let mut dockerinfo = File::create("dockerinfo.inf").unwrap();
+        dockerinfo.write_all(output.as_bytes()).unwrap();
+    } else if case == 1 {
+
+    }
 
 }
 
@@ -115,9 +119,13 @@ fn main() {
         ui.set_credentialcreation(false);
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
-        docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string());
+        docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string(), 0);
         println!("Executed");
         let dockerinfo = docker_info();
+        ui.on_terminal_input(move |terminalinput: slint::SharedString| {
+            let terminal = terminalinput.to_string();
+            docker_command(dockerip.clone(), terminal, 1);
+        });
     }
     ui.run().unwrap();
 }
