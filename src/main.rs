@@ -61,7 +61,7 @@ fn dockercreds(username_input: String, password_input: String, ip_addr_input: St
     authentication.write_all(auth.as_bytes()).unwrap();
 }
 
-fn docker_command(ip_addr_input: String, command: String, case: i32) {
+fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWindow) {
     let connectionaddress = format!("{}:22", ip_addr_input);
     let tcp = TcpStream::connect(connectionaddress).unwrap();
     let mut sess = Session::new().unwrap();
@@ -84,16 +84,17 @@ fn docker_command(ip_addr_input: String, command: String, case: i32) {
         let mut dockerinfo = File::create("dockerinfo.inf").unwrap();
         dockerinfo.write_all(output.as_bytes()).unwrap();
     } else if case == 1 {
-
+        ui.set_names(output.to_string().into());
     }
 
 }
 
-fn docker_info() -> Vec<DockerInfo> {
+fn docker_info(ui: &AppWindow) -> Vec<DockerInfo> {
     let getnewlines_file = fs::read("dockerinfo.inf").unwrap();
     let newlines_amount = getnewlines_file.lines().count();
     let newlines: i32 = newlines_amount as i32;
     println!("{}", newlines_amount);
+    ui.set_containeramount(newlines);
     let mut dockerinfo_item: Vec<DockerInfo> = Vec::new();
     let dockerinfo_file = File::open("dockerinfo.inf").unwrap();
     let mut dockerinfo_reader = BufReader::new(dockerinfo_file);
@@ -107,7 +108,7 @@ fn docker_info() -> Vec<DockerInfo> {
 }
 
 fn dockerinfo_toslint(ui: &AppWindow) {
-    let dockerinfo = docker_info();
+    let dockerinfo = docker_info(ui);
     let commands: String = dockerinfo.iter().map(|info| info.command.clone()).collect();
     ui.set_command(commands.into());
     let created_at: String = dockerinfo.iter().map(|info| info.createdat.clone()).collect();
@@ -122,8 +123,8 @@ fn dockerinfo_toslint(ui: &AppWindow) {
     ui.set_localvolumes(localvolumes.into());
     let mounts: String = dockerinfo.iter().map(|info| info.mounts.clone()).collect();
     ui.set_mounts(mounts.into());
-    let names: String = dockerinfo.iter().map(|info| info.names.clone()).collect();
-    ui.set_names(names.into());
+//    let names: String = dockerinfo.iter().map(|info| info.names.clone()).collect();
+//    ui.set_names(names.into());
     let networks: String = dockerinfo.iter().map(|info| info.networks.clone()).collect();
     ui.set_networks(networks.into());
     ui.set_platform("Null".into());
@@ -152,8 +153,9 @@ fn main() {
         ui.set_credentialcreation(false);
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
-        docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string(), 0);
+        docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string(), 0, &ui);
         println!("Executed");
+        docker_command(dockerip.clone(), r"docker ps --format '{{.Names}}'".to_string(), 1, &ui);
         dockerinfo_toslint(&ui);
         ui.on_terminal_input(move |terminalinput: slint::SharedString| {
             let terminal = terminalinput.to_string();

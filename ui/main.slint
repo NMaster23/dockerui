@@ -6,8 +6,9 @@ export component AppWindow inherits Window {
     property <bool> showcompletedload: false;
     property <int> loadingbarcompletion: 0;
     in property <int> tabnumber;
+    property <length> width1: root.width / 4;
     in-out property <bool> refreshbutton: false;
-    property <length> infofontsize: root.height * 0.035;
+    in-out property <int> containeramount;
     in-out property <string> terminaltext;
     in-out property <string> command;
     in-out property <string> createdat;
@@ -79,17 +80,64 @@ export component AppWindow inherits Window {
         }
         TabWidget {
             Tab {
-                title: "Docker Info";
-                HorizontalLayout {
+                title: "Containers";
+                GridLayout {
+                    spacing: 10px;
                     Rectangle {
-                        width: 200px;
-                        height: 200px;
+                        col: 0;
+                        row: 0;
+                        border-width: 1px;
                         border-color: aqua;
-                        border-width: 10px;
+                        border-radius: 10px;
+                        width: text1.width;
+                        max-height: 50px;
                         Text {
+                            text: "Container Names:";
+                            wrap: word-wrap;
+                            font-size: 20pt;
+                            width: text1.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 0;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text1.width + 30px;
+                        height: text1.height + 30px;
+                        text1:= Text {
                             text: names;
-                            width: 100px;
-                            height: 200px;
+                            font-size: 20pt;
+                            width: width1;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text2.width;
+                        max-height: 50px;
+                        Text {
+                            text: "Creation Time:";
+                            font-size: 20pt;
+                            width: text2.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text2.width + 30px;
+                        height: text2.height + 30px;
+                        text2:= Text {
+                            font-size: 20pt;
+                            text: createdat;
+                            width: width1;
                             wrap: word-wrap;
                         }
                     }
