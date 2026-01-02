@@ -106,6 +106,39 @@ fn docker_info() -> Vec<DockerInfo> {
     return dockerinfo_item;
 }
 
+fn dockerinfo_toslint(ui: &AppWindow) {
+    let dockerinfo = docker_info();
+    let commands: String = dockerinfo.iter().map(|info| info.command.clone()).collect();
+    ui.set_command(commands.into());
+    let created_at: String = dockerinfo.iter().map(|info| info.createdat.clone()).collect();
+    ui.set_createdat(created_at.into());
+    let docker_id: String = dockerinfo.iter().map(|info| info.dockerid.clone()).collect();
+    ui.set_dockerid(docker_id.into());
+    let image: String = dockerinfo.iter().map(|info| info.image.clone()).collect();
+    ui.set_image(image.into());
+    let labels: String = dockerinfo.iter().map(|info| info.labels.clone()).collect();
+    ui.set_labels(labels.into());
+    let localvolumes: String = dockerinfo.iter().map(|info| info.localvolumes.clone()).collect();
+    ui.set_localvolumes(localvolumes.into());
+    let mounts: String = dockerinfo.iter().map(|info| info.mounts.clone()).collect();
+    ui.set_mounts(mounts.into());
+    let names: String = dockerinfo.iter().map(|info| info.names.clone()).collect();
+    ui.set_names(names.into());
+    let networks: String = dockerinfo.iter().map(|info| info.networks.clone()).collect();
+    ui.set_networks(networks.into());
+    ui.set_platform("Null".into());
+    let ports: String = dockerinfo.iter().map(|info| info.ports.clone()).collect();
+    ui.set_ports(ports.into());
+    let uptime: String = dockerinfo.iter().map(|info| info.runningfor.clone()).collect();
+    ui.set_runningfor(uptime.into());
+    let state: String = dockerinfo.iter().map(|info| info.size.clone()).collect();
+    ui.set_size(state.into());
+    let status: String = dockerinfo.iter().map(|info| info.state.clone()).collect();
+    ui.set_state(status.into());
+    let docker_status: String = dockerinfo.iter().map(|info| info.status.clone()).collect();
+    ui.set_status(docker_status.into());
+    
+}
 
 fn main() {
     let ui = AppWindow::new().unwrap();
@@ -121,10 +154,10 @@ fn main() {
         let dockerip = dockercred.ip_addr.to_string();
         docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string(), 0);
         println!("Executed");
-        let dockerinfo = docker_info();
+        dockerinfo_toslint(&ui);
         ui.on_terminal_input(move |terminalinput: slint::SharedString| {
             let terminal = terminalinput.to_string();
-            docker_command(dockerip.clone(), terminal, 1);
+//            docker_command(dockerip.clone(), terminal, 1);
         });
     }
     ui.run().unwrap();
