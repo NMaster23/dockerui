@@ -89,7 +89,7 @@ export component AppWindow inherits Window {
                         border-width: 1px;
                         border-color: aqua;
                         border-radius: 10px;
-                        width: text1.width;
+                        width: text1.width + 30px;
                         max-height: 50px;
                         Text {
                             text: "Container Names:";
@@ -118,7 +118,7 @@ export component AppWindow inherits Window {
                         border-width: 1px;
                         border-color: aqua;
                         border-radius: 10px;
-                        width: text2.width;
+                        width: text2.width + 30px;
                         max-height: 50px;
                         Text {
                             text: "Creation Time:";
@@ -137,6 +137,100 @@ export component AppWindow inherits Window {
                         text2:= Text {
                             font-size: 20pt;
                             text: createdat;
+                            width: width1;
+                            wrap: word-wrap;
+                        }
+                    }
+                    Rectangle {
+                        col: 2;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text3.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Container ID:";
+                            font-size: 18.25pt;
+                            width: text3.width - 30px;
+                            wrap: word-wrap;
+                        }
+                    }
+                    Rectangle {
+                        col: 2;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text3.width + 30px;
+                        height: text3.height + 30px;
+                        text3:= Text {
+                            font-size: 20pt;
+                            text: dockerid;
+                            width: 175px;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+            }
+            Tab {
+                title: "Images";
+                GridLayout {
+                    spacing: 10px;
+                    Rectangle {
+                        col: 0;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text4.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Container Names:";
+                            wrap: word-wrap;
+                            font-size: 20pt;
+                            width: text4.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 0;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text4.width + 30px;
+                        height: text4.height + 30px;
+                        text4:= Text {
+                            text: names;
+                            font-size: 20pt;
+                            width: width1;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text2.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Images:";
+                            font-size: 20pt;
+                            width: text4.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text5.width + 30px;
+                        height: text5.height + 30px;
+                        text5:= Text {
+                            font-size: 20pt;
+                            text: image;
                             width: width1;
                             wrap: word-wrap;
                         }
