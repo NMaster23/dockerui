@@ -85,6 +85,10 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
         dockerinfo.write_all(output.as_bytes()).unwrap();
     } else if case == 1 {
         ui.set_names(output.to_string().into());
+    } else if case == 2 {
+        ui.set_image(output.to_string().into());
+    } else if case == 3 {
+        ui.set_networks(output.to_string().into());
     }
 
 }
@@ -115,18 +119,12 @@ fn dockerinfo_toslint(ui: &AppWindow) {
     ui.set_createdat(created_at.into());
     let docker_id: String = dockerinfo.iter().map(|info| info.dockerid.clone()).collect();
     ui.set_dockerid(docker_id.into());
-    let image: String = dockerinfo.iter().map(|info| info.image.clone()).collect();
-    ui.set_image(image.into());
     let labels: String = dockerinfo.iter().map(|info| info.labels.clone()).collect();
     ui.set_labels(labels.into());
     let localvolumes: String = dockerinfo.iter().map(|info| info.localvolumes.clone()).collect();
     ui.set_localvolumes(localvolumes.into());
     let mounts: String = dockerinfo.iter().map(|info| info.mounts.clone()).collect();
     ui.set_mounts(mounts.into());
-//    let names: String = dockerinfo.iter().map(|info| info.names.clone()).collect();
-//    ui.set_names(names.into());
-    let networks: String = dockerinfo.iter().map(|info| info.networks.clone()).collect();
-    ui.set_networks(networks.into());
     ui.set_platform("Null".into());
     let ports: String = dockerinfo.iter().map(|info| info.ports.clone()).collect();
     ui.set_ports(ports.into());
@@ -138,7 +136,6 @@ fn dockerinfo_toslint(ui: &AppWindow) {
     ui.set_state(status.into());
     let docker_status: String = dockerinfo.iter().map(|info| info.status.clone()).collect();
     ui.set_status(docker_status.into());
-    
 }
 
 fn main() {
@@ -156,6 +153,9 @@ fn main() {
         docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string(), 0, &ui);
         println!("Executed");
         docker_command(dockerip.clone(), r"docker ps --format '{{.Names}}'".to_string(), 1, &ui);
+        docker_command(dockerip.clone(), r"docker image list --format '{{.Repository}}'".to_string(), 2, &ui);
+        docker_command(dockerip.clone(), r"docker ps --format '{{.Networks}}'".to_string(), 3, &ui);
+        docker_command(dockerip.clone(), r"docker ps --format '{{.Ports}}'".to_string(), 4, &ui);
         dockerinfo_toslint(&ui);
         ui.on_terminal_input(move |terminalinput: slint::SharedString| {
             let terminal = terminalinput.to_string();
