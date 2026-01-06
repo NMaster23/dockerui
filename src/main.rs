@@ -74,7 +74,6 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
     channel.exec(&command).unwrap();
     let mut output = String::new();
     channel.read_to_string(&mut output).unwrap();
-    println!("{}", channel.exit_status().unwrap());
     let condition = channel.exit_status().unwrap();
     if condition != 0 {
         println!("Error 0. Unknown Error occurred.");
@@ -83,12 +82,6 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
     if case == 0 {
         let mut dockerinfo = File::create("dockerinfo.inf").unwrap();
         dockerinfo.write_all(output.as_bytes()).unwrap();
-    } else if case == 1 {
-        ui.set_names(output.to_string().into());
-    } else if case == 2 {
-        ui.set_image(output.to_string().into());
-    } else if case == 3 {
-        ui.set_networks(output.to_string().into());
     }
 
 }
@@ -97,7 +90,6 @@ fn docker_info(ui: &AppWindow) -> Vec<DockerInfo> {
     let getnewlines_file = fs::read("dockerinfo.inf").unwrap();
     let newlines_amount = getnewlines_file.lines().count();
     let newlines: i32 = newlines_amount as i32;
-    println!("{}", newlines_amount);
     ui.set_containeramount(newlines);
     let mut dockerinfo_item: Vec<DockerInfo> = Vec::new();
     let dockerinfo_file = File::open("dockerinfo.inf").unwrap();
@@ -149,11 +141,6 @@ fn refresh(ui: &AppWindow) {
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
         docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string(), 0, &ui);
-        println!("Executed");
-        docker_command(dockerip.clone(), r"docker ps --format '{{.Names}}'".to_string(), 1, &ui);
-        docker_command(dockerip.clone(), r"docker image list --format '{{.Repository}}'".to_string(), 2, &ui);
-        docker_command(dockerip.clone(), r"docker ps --format '{{.Networks}}'".to_string(), 3, &ui);
-        docker_command(dockerip.clone(), r"docker ps --format '{{.Ports}}'".to_string(), 4, &ui);
         docker_info(&ui);
         ui.on_terminal_input(move |terminalinput: slint::SharedString| {
             let terminal = terminalinput.to_string();

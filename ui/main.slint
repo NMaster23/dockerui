@@ -6,7 +6,6 @@ export component AppWindow inherits Window {
     property <bool> showcompletedload: false;
     property <int> loadingbarcompletion: 0;
     in property <int> tabnumber;
-    property <length> width1: root.width / 4;
     in-out property <bool> refreshbutton: false;
     in-out property <int> containeramount;
     in-out property <string> terminaltext;
@@ -109,7 +108,6 @@ export component AppWindow inherits Window {
                         text1:= Text {
                             text: names;
                             font-size: 20pt;
-                            width: width1;
                         }
                     }
                     Rectangle {
@@ -137,7 +135,6 @@ export component AppWindow inherits Window {
                         text2:= Text {
                             font-size: 20pt;
                             text: createdat;
-                            width: 400px;
                             height: text1.height;
                             wrap: word-wrap;
                         }
@@ -152,7 +149,7 @@ export component AppWindow inherits Window {
                         max-height: 50px;
                         Text {
                             text: "Container ID:";
-                            font-size: 18.25pt;
+                            font-size: 20pt;
                             width: text3.width - 30px;
                             wrap: word-wrap;
                         }
@@ -168,7 +165,6 @@ export component AppWindow inherits Window {
                         text3:= Text {
                             font-size: 20pt;
                             text: dockerid;
-                            width: 175px;
                             wrap: word-wrap;
                         }
                     }
@@ -204,7 +200,6 @@ export component AppWindow inherits Window {
                         text4:= Text {
                             text: names;
                             font-size: 20pt;
-                            width: width1;
                         }
                     }
                     Rectangle {
@@ -230,9 +225,8 @@ export component AppWindow inherits Window {
                         width: text5.width + 30px;
                         height: text5.height + 30px;
                         text5:= Text {
-                            font-size: 10pt;
+                            font-size: 20pt;
                             text: image;
-                            width: width1;
                         }
                     }
                 }
@@ -267,7 +261,6 @@ export component AppWindow inherits Window {
                         text6:= Text {
                             text: networks;
                             font-size: 20pt;
-                            width: 225px;
                             wrap: word-wrap;
                         }
                     }
@@ -293,9 +286,8 @@ export component AppWindow inherits Window {
                         border-radius: 10px;
                         width: text7.width + 30px;
                         text7:= Text {
-                            font-size: 10pt;
+                            font-size: 20pt;
                             text: ports;
-                            width: width1;
                             wrap: word-wrap;
                         }
                     }
@@ -311,7 +303,9 @@ export component AppWindow inherits Window {
                     }
                 }
                 TextEdit {
+                    y: 30px;
                     horizontal-alignment: center;
+                    preferred-width: root.width;
                     text: terminaltext;
                     enabled: false;
                 }
