@@ -108,44 +108,42 @@ fn docker_info(ui: &AppWindow) -> Vec<DockerInfo> {
         let dockerinfo_output: DockerInfo = serde_json::from_str(&dockerinfo_outputline).unwrap();
         dockerinfo_item.push(dockerinfo_output);
     }
+    let commands = dockerinfo_item.iter().map(|i| i.command.clone()).collect::<Vec<_>>().join("\n");
+    let createdat = dockerinfo_item.iter().map(|i| i.createdat.clone()).collect::<Vec<_>>().join("\n");
+    let dockerid = dockerinfo_item.iter().map(|i| i.dockerid.clone()).collect::<Vec<_>>().join("\n");
+    let image = dockerinfo_item.iter().map(|i| i.image.clone()).collect::<Vec<_>>().join("\n");
+    let labels = dockerinfo_item.iter().map(|i| i.labels.clone()).collect::<Vec<_>>().join("\n");
+    let localvolumes = dockerinfo_item.iter().map(|i| i.localvolumes.clone()).collect::<Vec<_>>().join("\n");
+    let mounts = dockerinfo_item.iter().map(|i| i.mounts.clone()).collect::<Vec<_>>().join("\n");
+    let names = dockerinfo_item.iter().map(|i| i.names.clone()).collect::<Vec<_>>().join("\n");
+    let networks = dockerinfo_item.iter().map(|i| i.networks.clone()).collect::<Vec<_>>().join("\n");
+    let platform = dockerinfo_item.iter().map(|i| i.platform.clone().unwrap_or("None".into())).collect::<Vec<_>>().join("\n");
+    let ports = dockerinfo_item.iter().map(|i| i.ports.clone()).collect::<Vec<_>>().join("\n");
+    let runningfor = dockerinfo_item.iter().map(|i| i.runningfor.clone()).collect::<Vec<_>>().join("\n");
+    let size = dockerinfo_item.iter().map(|i| i.size.clone()).collect::<Vec<_>>().join("\n");
+    let state = dockerinfo_item.iter().map(|i| i.state.clone()).collect::<Vec<_>>().join("\n");
+    let status = dockerinfo_item.iter().map(|i| i.status.clone()).collect::<Vec<_>>().join("\n");
+
+    ui.set_command(commands.into());
+    ui.set_createdat(createdat.into());
+    ui.set_dockerid(dockerid.into());
+    ui.set_image(image.into());
+    ui.set_labels(labels.into());
+    ui.set_localvolumes(localvolumes.into());
+    ui.set_mounts(mounts.into());
+    ui.set_names(names.into());
+    ui.set_networks(networks.into());
+    ui.set_platform(platform.into());
+    ui.set_ports(ports.into());
+    ui.set_runningfor(runningfor.into());
+    ui.set_size(size.into());
+    ui.set_state(state.into());
+    ui.set_status(status.into());
+
     return dockerinfo_item;
 }
 
-fn dockerinfo_toslint(ui: &AppWindow) {
-    let dockerinfo = docker_info(ui);
-    let commands: String = dockerinfo.iter().map(|info| info.command.clone()).collect();
-    ui.set_command(commands.into());
-    let created_at: String = dockerinfo.iter().map(|info| info.createdat.clone()).collect();
-    ui.set_createdat(created_at.into());
-    let docker_id: String = dockerinfo.iter().map(|info| info.dockerid.clone()).collect();
-    ui.set_dockerid(docker_id.into());
-    let labels: String = dockerinfo.iter().map(|info| info.labels.clone()).collect();
-    ui.set_labels(labels.into());
-    let localvolumes: String = dockerinfo.iter().map(|info| info.localvolumes.clone()).collect();
-    ui.set_localvolumes(localvolumes.into());
-    let mounts: String = dockerinfo.iter().map(|info| info.mounts.clone()).collect();
-    ui.set_mounts(mounts.into());
-    ui.set_platform("Null".into());
-    let ports: String = dockerinfo.iter().map(|info| info.ports.clone()).collect();
-    ui.set_ports(ports.into());
-    let uptime: String = dockerinfo.iter().map(|info| info.runningfor.clone()).collect();
-    ui.set_runningfor(uptime.into());
-    let state: String = dockerinfo.iter().map(|info| info.size.clone()).collect();
-    ui.set_size(state.into());
-    let status: String = dockerinfo.iter().map(|info| info.state.clone()).collect();
-    ui.set_state(status.into());
-    let docker_status: String = dockerinfo.iter().map(|info| info.status.clone()).collect();
-    ui.set_status(docker_status.into());
-}
-
-fn main() {
-    let ui = AppWindow::new().unwrap();
-    ui.on_send_credentials(|username_input: slint::SharedString, password_input: slint::SharedString, ip_addr_input: slint::SharedString| {
-        let uiusername = username_input.to_string();
-        let uipassword = password_input.to_string();
-        let uiipaddress = ip_addr_input.to_string();
-        dockercreds(uiusername, uipassword, uiipaddress);
-    });
+fn refresh(ui: &AppWindow) {
     if Path::new("dockercred.crd").exists() == true {
         ui.set_credentialcreation(false);
         let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
@@ -156,11 +154,22 @@ fn main() {
         docker_command(dockerip.clone(), r"docker image list --format '{{.Repository}}'".to_string(), 2, &ui);
         docker_command(dockerip.clone(), r"docker ps --format '{{.Networks}}'".to_string(), 3, &ui);
         docker_command(dockerip.clone(), r"docker ps --format '{{.Ports}}'".to_string(), 4, &ui);
-        dockerinfo_toslint(&ui);
+        docker_info(&ui);
         ui.on_terminal_input(move |terminalinput: slint::SharedString| {
             let terminal = terminalinput.to_string();
-//            docker_command(dockerip.clone(), terminal, 1);
+//            docker_command(dockerip.clone(), terminal, 5, &ui);
         });
     }
+}
+
+fn main() {
+    let ui = AppWindow::new().unwrap();
+    ui.on_send_credentials(|username_input: slint::SharedString, password_input: slint::SharedString, ip_addr_input: slint::SharedString| {
+        let uiusername = username_input.to_string();
+        let uipassword = password_input.to_string();
+        let uiipaddress = ip_addr_input.to_string();
+        dockercreds(uiusername, uipassword, uiipaddress);
+    });
+    refresh(&ui);
     ui.run().unwrap();
 }
