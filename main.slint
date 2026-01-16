@@ -1,0 +1,445 @@
+import { LineEdit, VerticalBox, Button, ProgressIndicator, TabWidget, HorizontalBox, TextEdit, GridBox, ScrollView } from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    in-out property <bool> credentialcreation: true;
+    property <bool> credentialsfilled: false;
+    property <bool> showcompletedload: false;
+    property <int> loadingbarcompletion: 0;
+    in property <int> tabnumber;
+    in-out property <bool> refreshbutton: false;
+    in-out property <int> containeramount;
+    in-out property <string> terminaltext;
+    in-out property <string> command;
+    in-out property <string> createdat;
+    in-out property <string> dockerid;
+    in-out property <string> image;
+    in-out property <string> labels;
+    in-out property <string> localvolumes;
+    in-out property <string> mounts;
+    in-out property <string> names;
+    in-out property <string> networks;
+    in-out property <string> platform;
+    in-out property <string> ports;
+    in-out property <string> runningfor;
+    in-out property <string> size;
+    in-out property <string> state;
+    in-out property <string> status;
+    preferred-width: 1000px;
+    preferred-height: 700px;
+    min-width: 600px;
+    min-height: 600px;
+
+    callback send_credentials(string, string, string);
+    callback send_refresh_state(bool);
+    callback terminal_input(string);
+
+    title: "Docker UI";
+    default-font-family: "JetBrains Mono";
+    resize-border-width: 0px;
+
+    VerticalBox {
+        uiusername:= LineEdit {
+            visible: root.credentialcreation;
+            max-height: 40px;
+            placeholder-text: "Username";
+            horizontal-alignment: center;
+        }
+        uipassword:= LineEdit {
+            visible: root.credentialcreation;
+            max-height: 40px;
+            placeholder-text: "Password";
+            input-type: password;
+            horizontal-alignment: center;
+        }
+        uiipaddress:= LineEdit {
+            visible: root.credentialcreation;
+            max-height: 40px;
+            placeholder-text: "IP Address";
+            horizontal-alignment: center;
+            accepted(text) => {
+                root.credentialsfilled = true;
+            }
+        }
+        if root.credentialcreation && root.credentialsfilled: Button {
+            text: "Submit";
+            preferred-height: 40px;
+            preferred-width: 100px;
+            
+            clicked => {
+                root.credentialcreation = false;
+                send_credentials(uiusername.text, uipassword.text, uiipaddress.text);
+            }
+        }
+        Button {
+            text: "Refresh";
+            clicked => {
+                root.refreshbutton = true;
+                send_refresh_state(true)
+            }
+        }
+        TabWidget {
+            Tab {
+                title: "Containers";
+                GridLayout {
+                    spacing: 10px;
+                    Rectangle {
+                        col: 0;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text1.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Container Names:";
+                            wrap: word-wrap;
+                            font-size: 20pt;
+                            width: text1.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 0;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text1.width + 30px;
+                        height: text1.height + 30px;
+                        text1:= Text {
+                            text: names;
+                            font-size: 20pt;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text2.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Creation Time:";
+                            font-size: 20pt;
+                            width: text2.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text2.width + 30px;
+                        height: text3.height + 30px;
+                        text2:= Text {
+                            font-size: 20pt;
+                            text: createdat;
+                            wrap: word-wrap;
+                        }
+                    }
+                    Rectangle {
+                        col: 2;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text3.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Container ID:";
+                            font-size: 20pt;
+                            width: text3.width - 30px;
+                            wrap: word-wrap;
+                        }
+                    }
+                    Rectangle {
+                        col: 2;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text3.width + 30px;
+                        height: text3.height + 30px;
+                        text3:= Text {
+                            font-size: 20pt;
+                            text: dockerid;
+                            wrap: word-wrap;
+                        }
+                    }
+                    Rectangle {
+                        col: 3;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text8.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Container Size:";
+                            font-size: 20pt;
+                            width: text8.width - 30px;
+                            wrap: word-wrap;
+                        }
+                    }
+                    Rectangle {
+                        col: 3;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text8.width + 30px;
+                        height: text8.height + 30px;
+                        text8:= Text {
+                            font-size: 20pt;
+                            text: size;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+            }
+            Tab {
+                title: "Images";
+                GridLayout {
+                    spacing: 10px;
+                    Rectangle {
+                        col: 0;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text4.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Container Names:";
+                            wrap: word-wrap;
+                            font-size: 20pt;
+                            width: text4.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 0;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text4.width + 30px;
+                        height: text4.height + 30px;
+                        text4:= Text {
+                            text: names;
+                            font-size: 20pt;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text5.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Images:";
+                            font-size: 20pt;
+                            width: text5.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text5.width + 30px;
+                        height: text5.height + 30px;
+                        text5:= Text {
+                            font-size: 20pt;
+                            text: image;
+                        }
+                    }
+                }
+            }
+            Tab {
+                title: "Networking";
+                GridLayout {
+                    spacing: 10px;
+                    Rectangle {
+                        col: 0;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text6.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Docker Networks:";
+                            wrap: word-wrap;
+                            font-size: 20pt;
+                            width: text6.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 0;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text6.width + 30px;
+                        height: text6.height + 30px;
+                        text6:= Text {
+                            text: networks;
+                            font-size: 20pt;
+                            wrap: word-wrap;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 0;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text7.width + 30px;
+                        max-height: 50px;
+                        Text {
+                            text: "Network Ports:";
+                            font-size: 20pt;
+                            width: text7.width - 30px;
+                        }
+                    }
+                    Rectangle {
+                        col: 1;
+                        row: 1;
+                        border-width: 1px;
+                        border-color: aqua;
+                        border-radius: 10px;
+                        width: text7.width + 30px;
+                        text7:= Text {
+                            font-size: 10pt;
+                            text: ports;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+            }
+            Tab {
+                title: "Live Data";
+                    GridLayout {
+                        spacing: 10px;
+                        Rectangle {
+                            col: 0;
+                            row: 0;
+                            border-width: 1px;
+                            border-color: aqua;
+                            border-radius: 10px;
+                            width: text12.width + 30px;
+                            max-height: 50px;
+                            Text {
+                                text: "Container Names:";
+                                wrap: word-wrap;
+                                font-size: 20pt;
+                                width: text12.width - 30px;
+                            }
+                        }
+                        Rectangle {
+                            col: 0;
+                            row: 1;
+                            border-width: 1px;
+                            border-color: aqua;
+                            border-radius: 10px;
+                            width: text12.width + 30px;
+                            height: text12.height + 30px;
+                            text12:= Text {
+                                text: names;
+                                font-size: 20pt;
+                            }
+                        }
+                        Rectangle {
+                            col: 1;
+                            row: 0;
+                            border-width: 1px;
+                            border-color: aqua;
+                            border-radius: 10px;
+                            width: text9.width + 30px;
+                            max-height: 50px;
+                            Text {
+                                text: "Container Uptime:";
+                                font-size: 20pt;
+                                width: text9.width - 30px;
+                                wrap: word-wrap;
+                            }
+                        }
+                        Rectangle {
+                            col: 1;
+                            row: 1;
+                            border-width: 1px;
+                            border-color: aqua;
+                            border-radius: 10px;
+                            width: text9.width + 30px;
+                            height: text9.height + 30px;
+                            text9:= Text {
+                                font-size: 20pt;
+                                text: runningfor;
+                                wrap: word-wrap;
+                            }
+                        }
+                        Rectangle {
+                            col: 2;
+                            row: 0;
+                            border-width: 1px;
+                            border-color: aqua;
+                            border-radius: 10px;
+                            width: text10.width + 30px;
+                            max-height: 50px;
+                            text10:= Text {
+                                text: "Container State:";
+                                font-size: 20pt;
+                                wrap: word-wrap;
+                            }
+                        }
+                        Rectangle {
+                            col: 2;
+                            row: 1;
+                            border-width: 1px;
+                            border-color: aqua;
+                            border-radius: 10px;
+                            width: text10.width + 30px;
+                            Text {
+                                font-size: 20pt;
+                                text: state;
+                                wrap: word-wrap;
+                            }
+                        }
+                        Rectangle {
+                            col: 3;
+                            row: 0;
+                            border-width: 1px;
+                            border-color: aqua;
+                            border-radius: 10px;
+                            width: text11.width + 30px;
+                            max-height: 50px;
+                            Text {
+                                text: "Container Status:";
+                                font-size: 20pt;
+                                width: text11.width - 30px;
+                                wrap: word-wrap;
+                            }
+                        }
+                        Rectangle {
+                            col: 3;
+                            row: 1;
+                            border-width: 1px;
+                            border-color: aqua;
+                            border-radius: 10px;
+                            width: text11.width + 30px;
+                            height: text11.height + 30px;
+                            text11:= Text {
+                                font-size: 20pt;
+                                text: status;
+                                wrap: word-wrap;
+                            }
+                        }
+                    }
+            }
+        }
+    }
+}
