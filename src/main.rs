@@ -4,6 +4,7 @@ use std::fs::File;
 use std::path::Path;
 use std::io::Write;
 use serde::{Serialize, Deserialize};
+use slint::ComponentHandle;
 use std::net::TcpStream;
 use ssh2::Session;
 
@@ -82,6 +83,8 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
     if case == 0 {
         let mut dockerinfo = File::create("dockerinfo.inf").unwrap();
         dockerinfo.write_all(output.as_bytes()).unwrap();
+    } else if case == 1 {
+        ui.set_terminaltext(output.into());
     }
 
 }
@@ -142,10 +145,6 @@ fn refresh(ui: &AppWindow) {
         let dockerip = dockercred.ip_addr.to_string();
         docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string(), 0, &ui);
         docker_info(&ui);
-        ui.on_terminal_input(move |terminalinput: slint::SharedString| {
-            let terminal = terminalinput.to_string();
-//            docker_command(dockerip.clone(), terminal, 5, &ui);
-        });
     }
 }
 
@@ -156,6 +155,12 @@ fn main() {
         let uipassword = password_input.to_string();
         let uiipaddress = ip_addr_input.to_string();
         dockercreds(uiusername, uipassword, uiipaddress);
+    });
+    let ui_clone = ui.clone_strong();
+    ui.on_send_refresh_state(move |refreshstate: bool| {
+        if refreshstate == true {
+            refresh(&ui_clone);
+        }
     });
     refresh(&ui);
     ui.run().unwrap();
