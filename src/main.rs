@@ -7,6 +7,7 @@ use serde::{Serialize, Deserialize};
 use slint::ComponentHandle;
 use std::net::TcpStream;
 use ssh2::Session;
+use magic_crypt::{new_magic_crypt, MagicCryptTrait};
 
 slint::include_modules!();
 
@@ -57,18 +58,24 @@ fn dockercreds(username_input: String, password_input: String, ip_addr_input: St
         password: password_input,
         ip_addr: ip_addr_input,
     };
+    let encryption = new_magic_crypt!("magickey", 256);
     let auth = serde_json::to_string(&dockercred).unwrap();
     let mut authentication = File::create("dockercred.crd").unwrap();
-    authentication.write_all(auth.as_bytes()).unwrap();
+    let encrypted = encryption.encrypt_str_to_base64(&auth);
+    authentication.write_all(encrypted.as_bytes()).unwrap();
 }
 
 fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWindow) {
+    let encryption = new_magic_crypt!("magickey", 256);
     let connectionaddress = format!("{}:22", ip_addr_input);
     let tcp = TcpStream::connect(connectionaddress).unwrap();
     let mut sess = Session::new().unwrap();
     sess.set_tcp_stream(tcp);
     sess.handshake().unwrap();
-    let dockerauth: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
+    let auth_file = fs::read_to_string("dockercred.crd").expect("Unable to read file");
+    let decrypted: String = encryption.decrypt_base64_to_string(&auth_file).unwrap();
+    let dockerauth: DockerCred = serde_json::from_str(&decrypted).unwrap();
+    println!("{}", dockerauth.username);
     sess.userauth_password(&dockerauth.username, &dockerauth.password).unwrap();
     assert!(sess.authenticated());
     let mut channel = sess.channel_session().unwrap();
@@ -141,7 +148,10 @@ fn docker_info(ui: &AppWindow) -> Vec<DockerInfo> {
 fn refresh(ui: &AppWindow) {
     if Path::new("dockercred.crd").exists() == true {
         ui.set_credentialcreation(false);
-        let dockercred: DockerCred = serde_json::from_str(&fs::read_to_string("dockercred.crd").expect("Unable to read file")).unwrap();
+        let encryption = new_magic_crypt!("magickey", 256);
+        let auth_file = fs::read_to_string("dockercred.crd").expect("Unable to read file");
+        let decrypted: String = encryption.decrypt_base64_to_string(&auth_file).unwrap();
+        let dockercred: DockerCred = serde_json::from_str(&decrypted).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
         docker_command(dockerip.clone(), r"docker ps -a --format '{{json .}}'".to_string(), 0, &ui);
         docker_info(&ui);
