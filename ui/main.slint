@@ -8,7 +8,7 @@ export component AppWindow inherits Window {
     in property <int> tabnumber;
     in-out property <bool> refreshbutton: false;
     in-out property <int> containeramount;
-    in-out property <string> terminaltext;
+    in-out property <bool> file_exist;
     in-out property <string> command;
     in-out property <string> createdat;
     in-out property <string> dockerid;
@@ -31,7 +31,7 @@ export component AppWindow inherits Window {
 
     callback send_credentials(string, string, string);
     callback send_refresh_state(bool);
-    callback terminal_input(string);
+    callback docker_newcontainer_info(string, string);
 
     title: "Docker UI";
     default-font-family: "JetBrains Mono";
@@ -325,123 +325,187 @@ export component AppWindow inherits Window {
         }
         Tab {
             title: "Live Data";
-                GridLayout {
-                    spacing: 10px;
-                    Rectangle {
-                        col: 0;
-                        row: 0;
-                        border-width: 1px;
-                        border-color: aqua;
-                        border-radius: 10px;
-                        width: text12.width + 30px;
-                        max-height: 50px;
-                        Text {
-                            text: "Container Names:";
-                            wrap: word-wrap;
-                            font-size: 20pt;
-                            width: text12.width - 30px;
-                        }
+            GridLayout {
+                spacing: 10px;
+                Rectangle {
+                    col: 0;
+                    row: 0;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text12.width + 30px;
+                    max-height: 50px;
+                    Text {
+                        text: "Container Names:";
+                        wrap: word-wrap;
+                        font-size: 20pt;
+                        width: text12.width - 30px;
                     }
-                    Rectangle {
-                        col: 0;
-                        row: 1;
-                        border-width: 1px;
-                        border-color: aqua;
-                        border-radius: 10px;
-                        width: text12.width + 30px;
-                        height: text12.height + 30px;
-                        text12:= Text {
-                            text: names;
-                            font-size: 20pt;
-                        }
+                }
+                Rectangle {
+                    col: 0;
+                    row: 1;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text12.width + 30px;
+                    height: text12.height + 30px;
+                    text12:= Text {
+                        text: names;
+                        font-size: 20pt;
                     }
-                    Rectangle {
-                        col: 1;
-                        row: 0;
-                        border-width: 1px;
-                        border-color: aqua;
-                        border-radius: 10px;
-                        width: text9.width + 30px;
-                        max-height: 50px;
-                        Text {
-                            text: "Container Uptime:";
-                            font-size: 20pt;
-                            width: text9.width - 30px;
-                            wrap: word-wrap;
-                        }
+                }
+                Rectangle {
+                    col: 1;
+                    row: 0;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text9.width + 30px;
+                    max-height: 50px;
+                    Text {
+                        text: "Container Uptime:";
+                        font-size: 20pt;
+                        width: text9.width - 30px;
+                        wrap: word-wrap;
                     }
-                    Rectangle {
-                        col: 1;
-                        row: 1;
-                        border-width: 1px;
-                        border-color: aqua;
-                        border-radius: 10px;
-                        width: text9.width + 30px;
-                        height: text9.height + 30px;
-                        text9:= Text {
-                            font-size: 20pt;
-                            text: runningfor;
-                            wrap: word-wrap;
-                        }
+                }
+                Rectangle {
+                    col: 1;
+                    row: 1;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text9.width + 30px;
+                    height: text9.height + 30px;
+                    text9:= Text {
+                        font-size: 20pt;
+                        text: runningfor;
+                        wrap: word-wrap;
                     }
-                    Rectangle {
-                        col: 2;
-                        row: 0;
-                        border-width: 1px;
-                        border-color: aqua;
-                        border-radius: 10px;
-                        width: text10.width + 30px;
-                        max-height: 50px;
-                        text10:= Text {
-                            text: "Container State:";
-                            font-size: 20pt;
-                            wrap: word-wrap;
-                        }
+                }
+                Rectangle {
+                    col: 2;
+                    row: 0;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text10.width + 30px;
+                    max-height: 50px;
+                    text10:= Text {
+                        text: "Container State:";
+                        font-size: 20pt;
+                        wrap: word-wrap;
                     }
-                    Rectangle {
-                        col: 2;
-                        row: 1;
-                        border-width: 1px;
-                        border-color: aqua;
-                        border-radius: 10px;
-                        width: text10.width + 30px;
-                        Text {
-                            font-size: 20pt;
-                            text: state;
-                            wrap: word-wrap;
-                        }
+                }
+                Rectangle {
+                    col: 2;
+                    row: 1;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text10.width + 30px;
+                    Text {
+                        font-size: 20pt;
+                        text: state;
+                        wrap: word-wrap;
                     }
-                    Rectangle {
-                        col: 3;
-                        row: 0;
-                        border-width: 1px;
-                        border-color: aqua;
-                        border-radius: 10px;
-                        width: text11.width + 30px;
-                        max-height: 50px;
-                        Text {
-                            text: "Container Status:";
-                            font-size: 20pt;
-                            width: text11.width - 30px;
-                            wrap: word-wrap;
-                        }
+                }
+                Rectangle {
+                    col: 3;
+                    row: 0;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text11.width + 30px;
+                    max-height: 50px;
+                    Text {
+                        text: "Container Status:";
+                        font-size: 20pt;
+                        width: text11.width - 30px;
+                        wrap: word-wrap;
                     }
-                    Rectangle {
-                        col: 3;
-                        row: 1;
-                        border-width: 1px;
-                        border-color: aqua;
-                        border-radius: 10px;
-                        width: text11.width + 30px;
-                        height: text11.height + 30px;
-                        text11:= Text {
-                            font-size: 20pt;
-                            text: status;
-                            wrap: word-wrap;
-                        }
+                }
+                Rectangle {
+                    col: 3;
+                    row: 1;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text11.width + 30px;
+                    height: text11.height + 30px;
+                    text11:= Text {
+                        font-size: 20pt;
+                        text: status;
+                        wrap: word-wrap;
                     }
                 }
             }
+        }
+        Tab {
+            title: "Manage Containers";
+            GridLayout {
+                spacing: 10px;
+                Rectangle {
+                    col: 0;
+                    row: 0;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text1.width + 30px;
+                    max-height: 50px;
+                    Text {
+                        text: "Container Names:";
+                        wrap: word-wrap;
+                        font-size: 20pt;
+                        width: text1.width - 30px;
+                    }
+                }
+                Rectangle {
+                    col: 0;
+                    row: 1;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    width: text1.width + 30px;
+                    height: text1.height + 30px;
+                    Text {
+                        text: names;
+                        font-size: 20pt;
+                    }
+                }
+            }
+        }
+        Tab {
+            title: "Create Container";
+            GridLayout {
+                spacing: 10px;
+                dockeryaml:= TextEdit {
+                    col: 1;
+                    row: 0;
+                    font-size: 12pt;
+                    min-height: 300px;
+                    min-width: 600px;
+                    placeholder-text: "Docker Compose YAML here...";
+                }
+                containername:= LineEdit {
+                    col: 2;
+                    row: 0;
+                    placeholder-text: "Container Name";
+                    max-height: 40px;
+                    font-size: 20pt;
+                }
+                Button {
+                    col: 1;
+                    row: 1;
+                    text: "Apply";
+                    max-height: 40px;
+                    clicked => {
+                        docker_newcontainer_info(containername.text, dockeryaml.text);
+                    }
+                }
+            }
+        }
         }
     }
 }
