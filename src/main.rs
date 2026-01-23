@@ -75,7 +75,6 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
     let auth_file = fs::read_to_string("dockercred.crd").expect("Unable to read file");
     let decrypted: String = encryption.decrypt_base64_to_string(&auth_file).unwrap();
     let dockerauth: DockerCred = serde_json::from_str(&decrypted).unwrap();
-    println!("{}", dockerauth.username);
     sess.userauth_password(&dockerauth.username, &dockerauth.password).unwrap();
     assert!(sess.authenticated());
     let mut channel = sess.channel_session().unwrap();
@@ -91,9 +90,18 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
         let mut dockerinfo = File::create("dockerinfo.inf").unwrap();
         dockerinfo.write_all(output.as_bytes()).unwrap();
     } else if case == 1 {
-        ui.set_terminaltext(output.into());
+        if output.contains("exists") {
+            ui.set_file_exist(true);
+        } else {
+            ui.set_file_exist(false);
+        }
+    } else if case == 2 {
+        println!("Docker UI directory created.");
+    } else if case == 3 {
+        println!("New container directory created. Please edit the docker.yaml file.");
+    } else if case == 4 {
+        println!("Docker YAML file created. Please proceed to deploy the container.");
     }
-
 }
 
 fn docker_info(ui: &AppWindow) -> Vec<DockerInfo> {
@@ -160,17 +168,35 @@ fn refresh(ui: &AppWindow) {
 
 fn main() {
     let ui = AppWindow::new().unwrap();
+    let encryption = new_magic_crypt!("magickey", 256);
+    let auth_file = fs::read_to_string("dockercred.crd").expect("Unable to read file");
+    let decrypted: String = encryption.decrypt_base64_to_string(&auth_file).unwrap();
+    let dockercred: DockerCred = serde_json::from_str(&decrypted).unwrap();
+    let dockerip = dockercred.ip_addr.to_string();
+    let ui_refresh = ui.clone_strong();
     ui.on_send_credentials(|username_input: slint::SharedString, password_input: slint::SharedString, ip_addr_input: slint::SharedString| {
         let uiusername = username_input.to_string();
         let uipassword = password_input.to_string();
         let uiipaddress = ip_addr_input.to_string();
         dockercreds(uiusername, uipassword, uiipaddress);
     });
-    let ui_clone = ui.clone_strong();
+    docker_command(dockerip.clone(), r"[ -f /path/to/file ] && echo 'exists' || echo 'missing'".to_string(), 1, &ui);
+    if ui.get_file_exist() == true {
+        docker_command(dockerip.clone(), "mkdir dockerui".to_string(), 2, &ui);
+    }
     ui.on_send_refresh_state(move |refreshstate: bool| {
         if refreshstate == true {
-            refresh(&ui_clone);
+            refresh(&ui_refresh);
         }
+    });
+    let ui_container = ui.clone_strong();
+    ui.on_docker_newcontainer_info(move |containername: slint::SharedString, dockeryaml: slint::SharedString| {
+        let uicontainername = containername.to_string().to_lowercase();
+        let uidockeryaml = dockeryaml.to_string();
+        let newcontainer_command = format!("cd dockerui && mkdir {} && cd {}", uicontainername, uicontainername);
+        let container_content = format!("cat > file.txt <<EOF {} EOF", uidockeryaml);
+        docker_command(dockerip.clone(), newcontainer_command, 3, &ui_container);
+        docker_command(dockerip.clone(), container_content, 4, &ui_container);
     });
     refresh(&ui);
     ui.run().unwrap();
