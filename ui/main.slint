@@ -7,6 +7,9 @@ export component AppWindow inherits Window {
     property <int> loadingbarcompletion: 0;
     in property <int> tabnumber;
     in-out property <bool> refreshbutton: false;
+    in-out property <bool> start_allcontainers;
+    in-out property <bool> stop_allcontainers;
+    in-out property <[string]> button_texts;
     in-out property <int> containeramount;
     in-out property <bool> file_exist;
     in-out property <string> command;
@@ -32,6 +35,7 @@ export component AppWindow inherits Window {
     callback send_credentials(string, string, string);
     callback send_refresh_state(bool);
     callback docker_newcontainer_info(string, string);
+    callback startstop_allcontainers(bool);
 
     title: "Docker UI";
     default-font-family: "JetBrains Mono";
@@ -472,6 +476,24 @@ export component AppWindow inherits Window {
                     Text {
                         text: names;
                         font-size: 20pt;
+                    }
+                }
+                Button {
+                    col: 1;
+                    text: "Start All Containers";
+                    max-height: 40px;
+                    clicked => {
+                        start_allcontainers = true;
+                        startstop_allcontainers(start_allcontainers);
+                    }
+                }
+                Button {
+                    col: 2;
+                    text: "Stop All Containers";
+                    max-height: 40px;
+                    clicked => {
+                        stop_allcontainers = true;
+                        startstop_allcontainers(stop_allcontainers);
                     }
                 }
             }
