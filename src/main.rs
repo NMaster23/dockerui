@@ -180,6 +180,10 @@ fn main() {
         let uiipaddress = ip_addr_input.to_string();
         dockercreds(uiusername, uipassword, uiipaddress);
     });
+    let dockerinfo_text = docker_info(&ui);
+    let button_textpre: Vec<slint::SharedString> = dockerinfo_text.iter().map(|d| slint::SharedString::from(d.names.clone())).collect();
+    let button_texts = slint::ModelRc::new(slint::VecModel::from(button_textpre));
+    ui.set_button_texts(button_texts);
     docker_command(dockerip.clone(), r"[ -f /path/to/file ] && echo 'exists' || echo 'missing'".to_string(), 1, &ui);
     if ui.get_file_exist() == true {
         docker_command(dockerip.clone(), "mkdir dockerui".to_string(), 2, &ui);
