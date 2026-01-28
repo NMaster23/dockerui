@@ -496,38 +496,49 @@ export component AppWindow inherits Window {
                         startstop_allcontainers(stop_allcontainers);
                     }
                 }
+                ScrollView {
+                    preferred-height: text1.height + 30px;
+                    HorizontalBox {
+                        VerticalBox {
+                            for name[i] in button_texts : Button {
+                                text: "Start " + button_texts[i];
+                                primary: true;
+                            }
+                        }
+                        VerticalBox {
+                            for name[i] in button_texts : Button {
+                                text: "Stop " + button_texts[i];
+                                primary: false;
+                            }
+                        }
+                    }
+                }
             }
         }
         Tab {
             title: "Create Container";
-            GridLayout {
+            VerticalLayout {
                 spacing: 10px;
-                dockeryaml:= TextEdit {
-                    col: 1;
-                    row: 0;
-                    font-size: 12pt;
-                    min-height: 300px;
-                    min-width: 600px;
-                    placeholder-text: "Docker Compose YAML here...";
-                }
                 containername:= LineEdit {
-                    col: 2;
-                    row: 0;
                     placeholder-text: "Container Name";
                     max-height: 40px;
-                    font-size: 20pt;
+                }
+                dockeryaml:= TextEdit {
+                    font-size: 12pt;
+                    preferred-height: 100%;
+                    preferred-width: 100%;
+                    placeholder-text: "Docker Compose YAML here...";
                 }
                 Button {
-                    col: 1;
-                    row: 1;
                     text: "Apply";
                     max-height: 40px;
+                    max-width: 100px;
                     clicked => {
                         docker_newcontainer_info(containername.text, dockeryaml.text);
                     }
                 }
             }
         }
-        }
     }
+}
 }
