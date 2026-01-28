@@ -99,7 +99,6 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
         println!("Docker UI directory created.");
     } else if case == 3 {
         println!("New container directory created. Please edit the docker.yaml file.");
-    } else if case == 4 {
         println!("Docker YAML file created. Please proceed to deploy the container.");
     }
 }
@@ -184,8 +183,8 @@ fn main() {
     let button_textpre: Vec<slint::SharedString> = dockerinfo_text.iter().map(|d| slint::SharedString::from(d.names.clone())).collect();
     let button_texts = slint::ModelRc::new(slint::VecModel::from(button_textpre));
     ui.set_button_texts(button_texts);
-    docker_command(dockerip.clone(), r"[ -f /path/to/file ] && echo 'exists' || echo 'missing'".to_string(), 1, &ui);
-    if ui.get_file_exist() == true {
+    docker_command(dockerip.clone(), r"[ -f dockerui ] && echo 'exists' || echo 'missing'".to_string(), 1, &ui);
+    if ui.get_file_exist() == false {
         docker_command(dockerip.clone(), "mkdir dockerui".to_string(), 2, &ui);
     }
     ui.on_send_refresh_state(move |refreshstate: bool| {
@@ -197,10 +196,8 @@ fn main() {
     ui.on_docker_newcontainer_info(move |containername: slint::SharedString, dockeryaml: slint::SharedString| {
         let uicontainername = containername.to_string().to_lowercase();
         let uidockeryaml = dockeryaml.to_string();
-        let newcontainer_command = format!("cd dockerui && mkdir {} && cd {}", uicontainername, uicontainername);
-        let container_content = format!("cat > file.txt <<EOF {} EOF", uidockeryaml);
-        docker_command(dockerip.clone(), newcontainer_command, 3, &ui_container);
-        docker_command(dockerip.clone(), container_content, 4, &ui_container);
+        let new_container = format!("cd dockerui && mkdir {} && cd {} && cat > compose.yaml <<< \"{}\" && docker compose up -d", uicontainername, uicontainername, uidockeryaml);
+        docker_command(dockerip.clone(), new_container, 3, &ui_container);
     });
     refresh(&ui);
     ui.run().unwrap();
