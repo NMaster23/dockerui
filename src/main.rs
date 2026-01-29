@@ -1,5 +1,3 @@
-use std::thread::sleep;
-use std::time;
 use std::{fs, io::BufReader};
 use std::io::prelude::*;
 use std::fs::File;
