@@ -100,6 +100,10 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
     } else if case == 3 {
         println!("New container directory created. Please edit the docker.yaml file.");
         println!("Docker YAML file created. Please proceed to deploy the container.");
+    } else if case == 4 {
+        println!("All containers started.");
+    } else if case == 5 {
+        println!("All containers stopped.");
     }
 }
 
@@ -193,6 +197,31 @@ fn main() {
             if refreshstate == true {
                 refresh(&ui_refresh);
             }
+        });
+        let dockerip_startstop_all = dockerip.clone();
+        let ui_startstop_all = ui.clone_strong();
+        ui.on_startstop_allcontainers(move |startstop: bool | {
+            if startstop == true {
+                docker_command(dockerip_startstop_all.clone(), r"docker start $(docker ps -a -q)".to_string(), 4, &ui_startstop_all);
+            } else {
+                docker_command(dockerip_startstop_all.clone(), r"docker stop $(docker ps -a -q)".to_string(), 5, &ui_startstop_all);
+            }
+        });
+        let dockerip_start = dockerip.clone();
+        let ui_start = ui.clone_strong();
+        ui.on_start_container(move |containername: slint::SharedString| {
+            let uicontainername = containername.to_string();
+            let start_containercommand = format!("docker start {}", uicontainername);
+            docker_command(dockerip_start.clone(), start_containercommand, 6, &ui_start);
+            refresh(&ui_start);
+        });
+        let dockerip_stop = dockerip.clone();
+        let ui_stop = ui.clone_strong();
+        ui.on_stop_container(move |containername: slint::SharedString| {
+            let uicontainername = containername.to_string();
+            let stop_containercommand = format!("docker stop {}", uicontainername);
+            docker_command(dockerip_stop.clone(), stop_containercommand, 7, &ui_stop);
+            refresh(&ui_stop);
         });
         let ui_container = ui.clone_strong();
         ui.on_docker_newcontainer_info(move |containername: slint::SharedString, dockeryaml: slint::SharedString| {
