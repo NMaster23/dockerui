@@ -1,3 +1,5 @@
+use std::thread::sleep;
+use std::time;
 use std::{fs, io::BufReader};
 use std::io::prelude::*;
 use std::fs::File;
@@ -167,38 +169,41 @@ fn refresh(ui: &AppWindow) {
 
 fn main() {
     let ui = AppWindow::new().unwrap();
-    let encryption = new_magic_crypt!("magickey", 256);
-    let auth_file = fs::read_to_string("dockercred.crd").expect("Unable to read file");
-    let decrypted: String = encryption.decrypt_base64_to_string(&auth_file).unwrap();
-    let dockercred: DockerCred = serde_json::from_str(&decrypted).unwrap();
-    let dockerip = dockercred.ip_addr.to_string();
-    let ui_refresh = ui.clone_strong();
+    refresh(&ui);
     ui.on_send_credentials(|username_input: slint::SharedString, password_input: slint::SharedString, ip_addr_input: slint::SharedString| {
         let uiusername = username_input.to_string();
         let uipassword = password_input.to_string();
         let uiipaddress = ip_addr_input.to_string();
         dockercreds(uiusername, uipassword, uiipaddress);
     });
-    let dockerinfo_text = docker_info(&ui);
-    let button_textpre: Vec<slint::SharedString> = dockerinfo_text.iter().map(|d| slint::SharedString::from(d.names.clone())).collect();
-    let button_texts = slint::ModelRc::new(slint::VecModel::from(button_textpre));
-    ui.set_button_texts(button_texts);
-    docker_command(dockerip.clone(), r"[ -f dockerui ] && echo 'exists' || echo 'missing'".to_string(), 1, &ui);
-    if ui.get_file_exist() == false {
-        docker_command(dockerip.clone(), "mkdir dockerui".to_string(), 2, &ui);
-    }
-    ui.on_send_refresh_state(move |refreshstate: bool| {
-        if refreshstate == true {
-            refresh(&ui_refresh);
+    if Path::new("dockercred.crd").exists() == true {
+        let encryption = new_magic_crypt!("magickey", 256);
+        let auth_file = fs::read_to_string("dockercred.crd").expect("Unable to read file");
+        let decrypted: String = encryption.decrypt_base64_to_string(&auth_file).unwrap();
+        let dockercred: DockerCred = serde_json::from_str(&decrypted).unwrap();
+        let dockerip = dockercred.ip_addr.to_string();
+        let ui_refresh = ui.clone_strong();
+        let dockerinfo_text = docker_info(&ui);
+        let button_textpre: Vec<slint::SharedString> = dockerinfo_text.iter().map(|d| slint::SharedString::from(d.names.clone())).collect();
+        let button_texts = slint::ModelRc::new(slint::VecModel::from(button_textpre));
+        ui.set_button_texts(button_texts);
+        docker_command(dockerip.clone(), r"[ -f dockerui ] && echo 'exists' || echo 'missing'".to_string(), 1, &ui);
+        if ui.get_file_exist() == false {
+            docker_command(dockerip.clone(), "mkdir dockerui".to_string(), 2, &ui);
         }
-    });
-    let ui_container = ui.clone_strong();
-    ui.on_docker_newcontainer_info(move |containername: slint::SharedString, dockeryaml: slint::SharedString| {
-        let uicontainername = containername.to_string().to_lowercase();
-        let uidockeryaml = dockeryaml.to_string();
-        let new_container = format!("cd dockerui && mkdir {} && cd {} && cat > compose.yaml <<< \"{}\" && docker compose up -d", uicontainername, uicontainername, uidockeryaml);
-        docker_command(dockerip.clone(), new_container, 3, &ui_container);
-    });
-    refresh(&ui);
+        ui.on_send_refresh_state(move |refreshstate: bool| {
+            if refreshstate == true {
+                refresh(&ui_refresh);
+            }
+        });
+        let ui_container = ui.clone_strong();
+        ui.on_docker_newcontainer_info(move |containername: slint::SharedString, dockeryaml: slint::SharedString| {
+            let uicontainername = containername.to_string().to_lowercase();
+            let uidockeryaml = dockeryaml.to_string();
+            let new_container = format!("cd dockerui && mkdir {} && cd {} && cat > compose.yaml <<< \"{}\" && docker compose up -d", uicontainername, uicontainername, uidockeryaml);
+            docker_command(dockerip.clone(), new_container, 3, &ui_container);
+            refresh(&ui_container);
+        });
+    }
     ui.run().unwrap();
 }
