@@ -36,6 +36,8 @@ export component AppWindow inherits Window {
     callback send_refresh_state(bool);
     callback docker_newcontainer_info(string, string);
     callback startstop_allcontainers(bool);
+    callback stop_container(string);
+    callback start_container(string);
 
     title: "Docker UI";
     default-font-family: "JetBrains Mono";
@@ -504,12 +506,18 @@ export component AppWindow inherits Window {
                             for name[i] in button_texts : Button {
                                 text: "Start " + button_texts[i];
                                 primary: true;
+                                clicked => {
+                                    start_container(button_texts[i]);
+                                }
                             }
                         }
                         VerticalBox {
                             for name[i] in button_texts : Button {
                                 text: "Stop " + button_texts[i];
                                 primary: false;
+                                clicked => {
+                                    stop_container(button_texts[i]);
+                                }
                             }
                         }
                     }
