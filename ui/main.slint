@@ -536,6 +536,8 @@ export component AppWindow inherits Window {
                     max-width: 100px;
                     clicked => {
                         docker_newcontainer_info(containername.text, dockeryaml.text);
+                        containername.text = "";
+                        dockeryaml.text = "";
                     }
                 }
             }
