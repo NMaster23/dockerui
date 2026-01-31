@@ -104,6 +104,10 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
         println!("All containers started.");
     } else if case == 5 {
         println!("All containers stopped.");
+    } else if case == 6 {
+        println!("Container started.");
+    } else if case == 7 {
+        println!("Container stopped.");
     }
 }
 
@@ -153,6 +157,13 @@ fn docker_info(ui: &AppWindow) -> Vec<DockerInfo> {
     ui.set_state(state.into());
     ui.set_status(status.into());
 
+    let button_textpre: Vec<slint::SharedString> = dockerinfo_item.iter().map(|i| slint::SharedString::from(i.names.clone().trim())).collect();
+    let button_texts = slint::ModelRc::new(slint::VecModel::from(button_textpre));
+    ui.set_button_texts(button_texts);
+    let statusmodel_pre: Vec<slint::SharedString> = dockerinfo_item.iter().map(|i| slint::SharedString::from(i.state.clone().trim().to_lowercase())).collect();
+    let statusmodel = slint::ModelRc::new(slint::VecModel::from(statusmodel_pre));
+    ui.set_status_indicators(statusmodel);
+
     return dockerinfo_item;
 }
 
@@ -185,10 +196,6 @@ fn main() {
         let dockercred: DockerCred = serde_json::from_str(&decrypted).unwrap();
         let dockerip = dockercred.ip_addr.to_string();
         let ui_refresh = ui.clone_strong();
-        let dockerinfo_text = docker_info(&ui);
-        let button_textpre: Vec<slint::SharedString> = dockerinfo_text.iter().map(|d| slint::SharedString::from(d.names.clone())).collect();
-        let button_texts = slint::ModelRc::new(slint::VecModel::from(button_textpre));
-        ui.set_button_texts(button_texts);
         docker_command(dockerip.clone(), r"[ -f dockerui ] && echo 'exists' || echo 'missing'".to_string(), 1, &ui);
         if ui.get_file_exist() == false {
             docker_command(dockerip.clone(), "mkdir dockerui".to_string(), 2, &ui);
