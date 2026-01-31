@@ -10,6 +10,7 @@ export component AppWindow inherits Window {
     in-out property <bool> start_allcontainers;
     in-out property <bool> stop_allcontainers;
     in-out property <[string]> button_texts;
+    in-out property <[string]> status_indicators;
     in-out property <int> containeramount;
     in-out property <bool> file_exist;
     in-out property <string> command;
@@ -38,6 +39,7 @@ export component AppWindow inherits Window {
     callback startstop_allcontainers(bool);
     callback stop_container(string);
     callback start_container(string);
+    callback terminalinputtext(string);
 
     title: "Docker UI";
     default-font-family: "JetBrains Mono";
@@ -322,9 +324,8 @@ export component AppWindow inherits Window {
                     border-radius: 10px;
                     width: text7.width + 30px;
                     text7:= Text {
-                        font-size: 10pt;
                         text: ports;
-                        wrap: word-wrap;
+                        font-size: 20pt;
                     }
                 }
             }
@@ -452,8 +453,34 @@ export component AppWindow inherits Window {
             title: "Manage Containers";
             GridLayout {
                 spacing: 10px;
-                Rectangle {
+                run_indicator_container:= Rectangle {
                     col: 0;
+                    row: 1;
+                    border-width: 1px;
+                    border-color: aqua;
+                    border-radius: 10px;
+                    VerticalBox {
+                        spacing: 20px;
+                        for name[i] in status_indicators : Rectangle {
+                            width: 10px;
+                            height: 10px;
+                            border-radius: 10px;
+                            background: {
+                                if (status_indicators[i] == "running") {
+                                    aqua
+                                } if (status_indicators[i] == "exited") {
+                                    red
+                                } if (status_indicators[i] == "paused") {
+                                    yellow
+                                } else {
+                                    gray
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle {
+                    col: 1;
                     row: 0;
                     border-width: 1px;
                     border-color: aqua;
@@ -468,7 +495,7 @@ export component AppWindow inherits Window {
                     }
                 }
                 Rectangle {
-                    col: 0;
+                    col: 1;
                     row: 1;
                     border-width: 1px;
                     border-color: aqua;
@@ -481,21 +508,23 @@ export component AppWindow inherits Window {
                     }
                 }
                 Button {
-                    col: 1;
+                    col: 2;
                     text: "Start All Containers";
                     max-height: 40px;
                     primary: true;
                     clicked => {
                         start_allcontainers = true;
+                        stop_allcontainers = false;
                         startstop_allcontainers(start_allcontainers);
                     }
                 }
                 Button {
-                    col: 2;
+                    col: 3;
                     text: "Stop All Containers";
                     max-height: 40px;
                     clicked => {
                         stop_allcontainers = true;
+                        start_allcontainers = false;
                         startstop_allcontainers(stop_allcontainers);
                     }
                 }
