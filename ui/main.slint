@@ -6,6 +6,8 @@ export component AppWindow inherits Window {
     property <bool> showcompletedload: false;
     property <int> loadingbarcompletion: 0;
     in property <int> tabnumber;
+    in-out property <bool> popupvisible: false;
+    in-out property <string> popuptext;
     in-out property <bool> refreshbutton: false;
     in-out property <bool> start_allcontainers;
     in-out property <bool> stop_allcontainers;
@@ -86,6 +88,24 @@ export component AppWindow inherits Window {
             send_refresh_state(true)
         }
     }
+    if popupvisible: Rectangle {
+            width: parent.width;
+            height: parent.height;
+            background: rgba(0, 0, 0, 0.5);
+            Text {
+                text: root.popuptext;
+                color: white;
+                font-size: 20pt;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+            Button {
+                text: "Ok";
+                clicked => {
+                    root.popupvisible = false;
+                }
+            }
+        }
     TabWidget {
         visible: !root.credentialcreation;
         Tab {
