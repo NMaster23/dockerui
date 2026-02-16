@@ -83,7 +83,9 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
     channel.read_to_string(&mut output).unwrap();
     let condition = channel.exit_status().unwrap();
     if condition != 0 {
-        println!("Error 0. Unknown Error occurred.");
+        ui.set_popupvisible(true);
+        ui.set_popuptext("Error 0. Unknown Error occurred.".into());
+        return;
     }
     let _ = channel.close();
     if case == 0 {
@@ -96,18 +98,23 @@ fn docker_command(ip_addr_input: String, command: String, case: i32, ui: &AppWin
             ui.set_file_exist(false);
         }
     } else if case == 2 {
-        println!("Docker UI directory created.");
+        ui.set_popupvisible(true);
+        ui.set_popuptext("Docker UI directory created.".into());
     } else if case == 3 {
-        println!("New container directory created. Please edit the docker.yaml file.");
-        println!("Docker YAML file created. Please proceed to deploy the container.");
+        ui.set_popupvisible(true);
+        ui.set_popuptext("New container directory created. Please edit the docker.yaml file.".into());
     } else if case == 4 {
-        println!("All containers started.");
+        ui.set_popupvisible(true);
+        ui.set_popuptext("All containers started.".into());
     } else if case == 5 {
-        println!("All containers stopped.");
+        ui.set_popupvisible(true);
+        ui.set_popuptext("All containers stopped.".into());
     } else if case == 6 {
-        println!("Container started.");
+        ui.set_popupvisible(true);
+        ui.set_popuptext("Container started.".into());
     } else if case == 7 {
-        println!("Container stopped.");
+        ui.set_popupvisible(true);
+        ui.set_popuptext("Container stopped.".into());
     }
 }
 
