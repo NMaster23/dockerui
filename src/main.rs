@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use std::{fs, io::BufReader};
 use std::io::prelude::*;
 use std::fs::File;
